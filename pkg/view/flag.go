@@ -26,6 +26,7 @@ package view
 
 const (
 	FlagOutput = "output"
+	FlagLong   = "long"
 )
 
 type OutputOption string
