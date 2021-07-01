@@ -50,8 +50,8 @@ type PrintOptions struct {
 
 func PrintItems(c *cli.Context, items []interface{}, opts *PrintOptions) {
 	outputFlag := c.String(FlagOutput)
-	longFlag := c.Bool(FlagLong)
 	output := OutputOption(outputFlag)
+	columns := c.String(FlagColumns)
 
 	if opts.Pager == nil {
 		pager, close := newPagerWithDefault(c)
@@ -59,7 +59,7 @@ func PrintItems(c *cli.Context, items []interface{}, opts *PrintOptions) {
 		defer close()
 	}
 
-	if longFlag {
+	if columns == ColumnsLong {
 		opts.Fields = append(opts.Fields, opts.FieldsLong...)
 		opts.FieldsLong = []string{}
 	}

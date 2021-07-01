@@ -63,16 +63,14 @@ var FlagsForRendering = []cli.Flag{
 		Usage: fmt.Sprintf("format time as: %v, %v, %v.", format.Relative, format.ISO, format.Raw),
 		Value: string(format.Relative),
 	},
-	&cli.BoolFlag{
-		Name:    view.FlagLong,
-		Aliases: []string{"l"},
-		Usage:   "print more of main fields",
+	&cli.StringFlag{
+		Name:  view.FlagColumns,
+		Usage: "customize columns to print. Set to 'long' to automatically print more of main columns",
 	},
 	&cli.StringFlag{
-		Name:    color.FlagColor,
-		Aliases: []string{"c"},
-		Usage:   fmt.Sprintf("when to use color: %v, %v, %v.", color.Auto, color.Always, color.Never),
-		Value:   string(color.Auto),
+		Name:  color.FlagColor,
+		Usage: fmt.Sprintf("when to use color: %v, %v, %v.", color.Auto, color.Always, color.Never),
+		Value: string(color.Auto),
 	},
 }
 
