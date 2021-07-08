@@ -196,7 +196,6 @@ func RunWorkflow(c *cli.Context) {
 	fmt.Println(color.Magenta(c, "Running execution:"))
 	opts := &output.PrintOptions{
 		Fields:      []string{"WorkflowId", "RunId", "Type", "Namespace", "TaskQueue", "Args"},
-		NoHeader:    true,
 		IgnoreFlags: true,
 		Output:      output.Card,
 		Separator:   "",
