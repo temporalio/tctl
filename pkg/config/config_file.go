@@ -97,7 +97,7 @@ func configFile() (string, error) {
 	fpath := filepath.Join(dir, "config.yml")
 
 	if _, err := os.Stat(fpath); err != nil {
-		fmt.Printf("creating file: %v\n", fpath)
+		fmt.Printf("creating config file: %v\n", fpath)
 		file, err := os.Create(fpath)
 		if err != nil {
 			defer file.Close()
