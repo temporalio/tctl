@@ -94,7 +94,7 @@ func configFile() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fpath := filepath.Join(dir, "config.yml")
+	fpath := filepath.Join(dir, "tctl.yml")
 
 	if _, err := os.Stat(fpath); err != nil {
 		fmt.Printf("creating config file: %v\n", fpath)
@@ -114,11 +114,11 @@ func configDir() (string, error) {
 		return "", err
 	}
 
-	dpath = filepath.Join(dpath, ".config", "temporal-tctl")
+	dpath = filepath.Join(dpath, ".config", "temporalio")
 
 	if _, err := os.Stat(dpath); err != nil {
 		fmt.Printf("creating dir: %v\n", dpath)
-		err = os.MkdirAll(filepath.Dir(dpath), 0755)
+		err = os.MkdirAll(dpath, 0755)
 		return dpath, err
 	}
 
