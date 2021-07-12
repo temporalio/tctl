@@ -33,5 +33,5 @@ func Get(key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return config.ReadKey(key)
+	return config.GetValue(key)
 }

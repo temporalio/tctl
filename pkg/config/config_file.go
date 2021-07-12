@@ -38,7 +38,7 @@ type Config struct {
 	Root *yaml.Node
 }
 
-func (c *Config) ReadKey(key string) (string, error) {
+func (c *Config) GetValue(key string) (string, error) {
 	config, err := c.getRecord(key)
 	if err != nil {
 		return "", err
