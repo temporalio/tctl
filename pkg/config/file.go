@@ -38,16 +38,16 @@ type Config struct {
 	Root *yaml.Node
 }
 
-func (c *Config) GetValue(key string) (string, error) {
-	config, err := c.getRecord(key)
+func (cfg *Config) GetValue(key string) (string, error) {
+	record, err := cfg.getRecord(key)
 	if err != nil {
 		return "", err
 	}
-	return config.Value, nil
+	return record.Value, nil
 }
 
-func (c *Config) SetValue(key string, value string) error {
-	record, err := c.getRecord(key)
+func (cfg *Config) SetValue(key string, value string) error {
+	record, err := cfg.getRecord(key)
 	if err != nil {
 		key := &yaml.Node{
 			Kind:  yaml.ScalarNode,
@@ -58,17 +58,17 @@ func (c *Config) SetValue(key string, value string) error {
 			Value: value,
 		}
 
-		c.Root.Content[0].Content = append(c.Root.Content[0].Content, key, value)
+		cfg.Root.Content[0].Content = append(cfg.Root.Content[0].Content, key, value)
 	} else if record != nil {
 		record.Value = value
 	}
 
-	return writeConfig(c)
+	return writeConfig(cfg)
 }
 
-func (c *Config) getRecord(key string) (*yaml.Node, error) {
-	if len(c.Root.Content) > 0 {
-		nodes := c.Root.Content[0].Content
+func (cfg *Config) getRecord(key string) (*yaml.Node, error) {
+	if len(cfg.Root.Content) > 0 {
+		nodes := cfg.Root.Content[0].Content
 		for i, n := range nodes {
 			if n.Value == key {
 				var value *yaml.Node
@@ -100,18 +100,29 @@ func readConfig() (*Config, error) {
 		return nil, err
 	}
 
-	var config yaml.Node
-	err = yaml.Unmarshal(data, &config)
+	var cfgNode yaml.Node
+	err = yaml.Unmarshal(data, &cfgNode)
 	if err != nil {
 		return nil, err
 	}
 
-	if config.Kind == yaml.Kind(0) || len(config.Content) == 0 {
-		config.Kind = yaml.DocumentNode
-		config.Content = []*yaml.Node{{Kind: yaml.MappingNode}}
+	cfg := &Config{Root: &cfgNode}
+
+	err = populateDefaults(cfg)
+
+	return cfg, err
+}
+
+func populateDefaults(cfg *Config) error {
+	// add root document node if it doesn't exist
+	if cfg.Root.Kind == yaml.Kind(0) || len(cfg.Root.Content) == 0 {
+		cfg.Root.Kind = yaml.DocumentNode
+		cfg.Root.Content = []*yaml.Node{{Kind: yaml.MappingNode}}
 	}
 
-	return &Config{Root: &config}, nil
+	addAliasesRoot(cfg)
+
+	return nil
 }
 
 func writeConfig(cfg *Config) error {

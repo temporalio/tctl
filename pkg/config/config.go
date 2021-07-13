@@ -43,3 +43,11 @@ func Set(key string, value string) error {
 	}
 	return config.SetValue(key, value)
 }
+
+func SetAlias(key string, value string) error {
+	config, err := readConfig()
+	if err != nil {
+		return err
+	}
+	return config.SetAliasValue(key, value)
+}
