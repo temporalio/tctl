@@ -25,7 +25,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -33,55 +32,6 @@ import (
 
 	"gopkg.in/yaml.v3"
 )
-
-type Config struct {
-	Root *yaml.Node
-}
-
-func (cfg *Config) GetValue(key string) (string, error) {
-	record, err := cfg.getRecord(key)
-	if err != nil {
-		return "", err
-	}
-	return record.Value, nil
-}
-
-func (cfg *Config) SetValue(key string, value string) error {
-	record, err := cfg.getRecord(key)
-	if err != nil {
-		key := &yaml.Node{
-			Kind:  yaml.ScalarNode,
-			Value: key,
-		}
-		value := &yaml.Node{
-			Kind:  yaml.ScalarNode,
-			Value: value,
-		}
-
-		cfg.Root.Content[0].Content = append(cfg.Root.Content[0].Content, key, value)
-	} else if record != nil {
-		record.Value = value
-	}
-
-	return writeConfig(cfg)
-}
-
-func (cfg *Config) getRecord(key string) (*yaml.Node, error) {
-	if len(cfg.Root.Content) > 0 {
-		nodes := cfg.Root.Content[0].Content
-		for i, n := range nodes {
-			if n.Value == key {
-				var value *yaml.Node
-				if i < len(nodes)-1 {
-					value = nodes[i+1]
-				}
-				return value, nil
-			}
-		}
-	}
-
-	return nil, errors.New("unable to find key " + key)
-}
 
 func readConfig() (*Config, error) {
 	path, err := configFile()
@@ -108,23 +58,10 @@ func readConfig() (*Config, error) {
 
 	cfg := &Config{Root: &cfgNode}
 
-	err = populateDefaults(cfg)
+	err = setRootIfEmpty(cfg)
 
 	return cfg, err
 }
-
-func populateDefaults(cfg *Config) error {
-	// add root document node if it doesn't exist
-	if cfg.Root.Kind == yaml.Kind(0) || len(cfg.Root.Content) == 0 {
-		cfg.Root.Kind = yaml.DocumentNode
-		cfg.Root.Content = []*yaml.Node{{Kind: yaml.MappingNode}}
-	}
-
-	addAliasesRoot(cfg)
-
-	return nil
-}
-
 func writeConfig(cfg *Config) error {
 	data, err := yaml.Marshal(cfg.Root)
 	if err != nil {
@@ -180,4 +117,13 @@ func configDir() (string, error) {
 	}
 
 	return dpath, nil
+}
+
+func setRootIfEmpty(cfg *Config) error {
+	if cfg.Root.Kind == yaml.Kind(0) || len(cfg.Root.Content) == 0 {
+		cfg.Root.Kind = yaml.DocumentNode
+		cfg.Root.Content = []*yaml.Node{{Kind: yaml.MappingNode}}
+	}
+
+	return nil
 }

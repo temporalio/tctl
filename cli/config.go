@@ -52,14 +52,6 @@ func newConfigCommands() []*cli.Command {
 				return SetValue(c)
 			},
 		},
-		{
-			Name:  "set-alias",
-			Usage: "set command alias",
-			Flags: []cli.Flag{},
-			Action: func(c *cli.Context) error {
-				return SetAliasValue(c)
-			},
-		},
 	}
 }
 
@@ -110,23 +102,11 @@ func SetValue(c *cli.Context) error {
 	return nil
 }
 
-func SetAliasValue(c *cli.Context) error {
-	if c.NArg() != 2 {
-		ErrorAndExit("invalid number of args, expected 2: property and value", nil)
-	}
-
-	command := c.Args().Get(0)
-	value := c.Args().Get(1)
-
-	if err := config.SetAlias(command, value); err != nil {
-		ErrorAndExit(fmt.Sprintf("unable to set alias %v.", command), err)
-	}
-
-	fmt.Printf("%v: %v\n", color.Magenta(c, "%v", command), value)
-	return nil
-}
-
 func validateKey(key string) error {
+	// in composite keys such as alias.mycommand, the first part before dot is configuration property name
+	// second part is custom value
+	key = strings.Split(key, ".")[0]
+
 	for _, k := range validKeys {
 		if strings.Compare(key, k) == 0 {
 			return nil
