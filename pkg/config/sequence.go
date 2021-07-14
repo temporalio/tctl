@@ -31,7 +31,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// GetScalarValue set an entry for sequence property
+// GetScalarValue sets an entry for sequence property
 // ex. of sequence in .yml:
 // mySequence: # root
 //   - key: myKey1 # entry 1
