@@ -46,7 +46,11 @@ var FlagsForPagination = []cli.Flag{
 		Usage:   "disable interactive pager",
 	},
 	&cli.IntFlag{
-		Name:  pager.FlagPageSize,
+		Name:  output.FlagPages,
+		Usage: "number of pages to print",
+	},
+	&cli.IntFlag{
+		Name:  output.FlagPageSize,
 		Value: pager.DefaultListPageSize,
 		Usage: "items per page",
 	},

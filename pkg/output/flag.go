@@ -27,8 +27,10 @@ package output
 import "fmt"
 
 const (
-	FlagOutput  = "output"
-	FlagColumns = "columns"
+	FlagOutput   = "output"
+	FlagColumns  = "columns"
+	FlagPageSize = "page-size"
+	FlagPages    = "pages"
 
 	ColumnsLong = "long"
 )
