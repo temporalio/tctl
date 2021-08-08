@@ -35,6 +35,10 @@ import (
 )
 
 var FlagsForPagination = []cli.Flag{
+	&cli.IntFlag{
+		Name:  output.FlagLimit,
+		Usage: "number of items to print",
+	},
 	&cli.StringFlag{
 		Name:    pager.FlagPager,
 		Usage:   "pager to use: less, cat, favoritePager..",
@@ -44,15 +48,6 @@ var FlagsForPagination = []cli.Flag{
 		Name:    pager.FlagNoPager,
 		Aliases: []string{"P"},
 		Usage:   "disable interactive pager",
-	},
-	&cli.IntFlag{
-		Name:  output.FlagPages,
-		Usage: "number of pages to print",
-	},
-	&cli.IntFlag{
-		Name:  output.FlagPageSize,
-		Value: pager.DefaultListPageSize,
-		Usage: "items per page",
 	},
 }
 
