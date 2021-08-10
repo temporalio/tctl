@@ -41,7 +41,7 @@ var FlagsForPagination = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Name:    pager.FlagPager,
-		Usage:   "pager to use: less, cat, favoritePager..",
+		Usage:   "pager to use: less, more, favoritePager..",
 		EnvVars: []string{"PAGER"},
 	},
 	&cli.BoolFlag{
