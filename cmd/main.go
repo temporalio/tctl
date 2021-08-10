@@ -29,7 +29,6 @@ import (
 
 	"github.com/temporalio/tctl/cli"
 	"github.com/temporalio/tctl/pkg/config"
-
 	"github.com/temporalio/tctl/cli_curr"
 )
 
