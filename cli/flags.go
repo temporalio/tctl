@@ -340,15 +340,6 @@ var flagsForRunWorkflow = []cli.Flag{
 		Usage: "Optional input for the workflow from JSON file. If there are multiple JSON, concatenate them and separate by space or newline. " +
 			"Input from file will be overwrite by input from command line",
 	},
-	&cli.StringFlag{
-		Name:  FlagMemoKey,
-		Usage: "Optional key of memo. If there are multiple keys, concatenate them and separate by space",
-	},
-	&cli.StringFlag{
-		Name: FlagMemo,
-		Usage: "Optional info that can be showed when list workflow, in JSON format. If there are multiple JSON, concatenate them and separate by space. " +
-			"The order must be same as memo-key",
-	},
 	&cli.BoolFlag{
 		Name:  FlagShowDetailWithAlias,
 		Usage: "Show event details",
