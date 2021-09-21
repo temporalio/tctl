@@ -1,3 +1,5 @@
+[![Unit Tests](https://github.com/temporalio/tctl/actions/workflows/test.yml/badge.svg)](https://github.com/temporalio/tctl/actions/workflows/test.yml)
+
 **NOT READY FOR PRODUCTION**
 
 This is an ongoing work on tctl UX based on proposals:
