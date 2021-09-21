@@ -290,7 +290,7 @@ func DescribeNamespace(c *cli.Context) error {
 	namespaceID := c.String(FlagNamespaceID)
 
 	if namespaceID == "" && namespace == "" {
-		return fmt.Errorf("provide either namespace id or namespace name flag")
+		return fmt.Errorf("provide either %s or %s flag", FlagNamespaceID, FlagNamespace)
 	}
 	if c.IsSet(FlagNamespace) && namespaceID != "" {
 		return fmt.Errorf("provide only one of the flags: namespace id or namespace name")
