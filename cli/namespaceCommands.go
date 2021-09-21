@@ -64,7 +64,7 @@ func RegisterNamespace(c *cli.Context) error {
 	if c.IsSet(FlagIsGlobalNamespace) {
 		isGlobalNamespace, err = strconv.ParseBool(c.String(FlagIsGlobalNamespace))
 		if err != nil {
-			return fmt.Errorf("Option %s format is invalid: %s.", FlagIsGlobalNamespace, err)
+			return fmt.Errorf("option %s format is invalid: %w.", FlagIsGlobalNamespace, err)
 		}
 	}
 
