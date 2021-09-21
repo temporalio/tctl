@@ -409,7 +409,7 @@ func archivalState(c *cli.Context, stateFlagName string) (enumspb.ArchivalState,
 		case "enabled":
 			return enumspb.ARCHIVAL_STATE_ENABLED, nil
 		default:
-			return 0, fmt.Errorf("option %s format is invalid: %s", stateFlagName, errors.New("invalid state, valid values are \"disabled\" and \"enabled\""))
+			return 0, fmt.Errorf("option %s format is invalid: invalid state, valid values are \"disabled\" and \"enabled\"", stateFlagName)
 		}
 	}
 	return enumspb.ARCHIVAL_STATE_UNSPECIFIED, nil
