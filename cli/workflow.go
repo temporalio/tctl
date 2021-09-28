@@ -139,7 +139,7 @@ func newWorkflowCommands() []*cli.Command {
 		},
 		{
 			Name:  "scan",
-			Usage: "Scan workflow executions (requires Elasticsearch to be enabled). It is faster than listall, but output is not sorted.",
+			Usage: "Scan workflow executions (requires Elasticsearch to be enabled).",
 			Flags: append(flagsForScan, flags.FlagsForPaginationAndRendering...),
 			Action: func(c *cli.Context) error {
 				return ScanAllWorkflow(c)
