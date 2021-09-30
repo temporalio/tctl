@@ -42,11 +42,8 @@ func CompleteActivity(c *cli.Context) error {
 		return err
 	}
 
-	wid, rid, err := getWorkflowParams(c)
-	if err != nil {
-		return err
-	}
-
+	wid := c.String(FlagWorkflowIDWithAlias)
+	rid := c.String(FlagRunIDWithAlias)
 	if rid == "" {
 		return fmt.Errorf("provide non-empty run id")
 	}
@@ -84,14 +81,12 @@ func FailActivity(c *cli.Context) error {
 		return err
 	}
 
-	wid, rid, err := getWorkflowParams(c)
-	if err != nil {
-		return err
-	}
-
+	wid := c.String(FlagWorkflowIDWithAlias)
+	rid := c.String(FlagRunIDWithAlias)
 	if rid == "" {
 		return fmt.Errorf("provide non-empty run id")
 	}
+
 	activityID := c.String(FlagActivityID)
 	if len(activityID) == 0 {
 		return fmt.Errorf("provide non-empty activity id")
