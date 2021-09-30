@@ -65,13 +65,6 @@ import (
 	"go.temporal.io/server/service/history/workflow"
 )
 
-// ShowHistory shows the history of given workflow execution based on workflowID and runID.
-func ShowHistory(c *cli.Context) error {
-	wid, rid := getWorkflowParams(c)
-
-	return printWorkflowProgress(c, wid, rid, false)
-}
-
 // RunWorkflow starts a new workflow execution and print workflow progress and result
 func RunWorkflow(c *cli.Context) error {
 	sdkClient, err := getSDKClient(c)
@@ -723,7 +716,10 @@ func ListArchivedWorkflow(c *cli.Context) error {
 
 // DescribeWorkflow show information about the specified workflow execution
 func DescribeWorkflow(c *cli.Context) error {
-	wid, rid := getWorkflowParams(c)
+	wid, rid, err := getWorkflowParams(c)
+	if err != nil {
+		return err
+	}
 
 	frontendClient := cFactory.FrontendClient(c)
 	namespace, err := getRequiredGlobalOption(c, FlagNamespace)
@@ -913,9 +909,22 @@ func scanWorkflowExecutions(sdkClient sdkclient.Client, pageSize int, nextPageTo
 	return workflows.Executions, workflows.NextPageToken, nil
 }
 
+// ShowHistory shows the history of given workflow execution based on workflowID and runID.
+func ShowHistory(c *cli.Context) error {
+	wid, rid, err := getWorkflowParams(c)
+	if err != nil {
+		return err
+	}
+
+	return printWorkflowProgress(c, wid, rid, false)
+}
+
 // ObserveHistory show the process of running workflow
 func ObserveHistory(c *cli.Context) error {
-	wid, rid := getWorkflowParams(c)
+	wid, rid, err := getWorkflowParams(c)
+	if err != nil {
+		return err
+	}
 
 	return printWorkflowProgress(c, wid, rid, true)
 }
@@ -1485,20 +1494,24 @@ func getLastContinueAsNewID(ctx context.Context, namespace, wid, rid string, fro
 	return
 }
 
-func getWorkflowParams(c *cli.Context) (string, string) {
+func getWorkflowParams(c *cli.Context) (string, string, error) {
 	var wid, rid string
 
-	if c.NArg() >= 1 {
-		wid = c.Args().First()
-		if c.NArg() >= 2 {
-			rid = c.Args().Get(1)
-		}
-	} else {
+	if c.IsSet(FlagWorkflowID) {
 		wid = c.String(FlagWorkflowID)
-		rid = c.String(FlagRunID)
+	} else if c.NArg() >= 1 {
+		wid = c.Args().Get(0)
+	} else {
+		return "", "", fmt.Errorf("missing required flag: %s", FlagWorkflowID)
 	}
 
-	return wid, rid
+	if c.IsSet(FlagRunID) {
+		rid = c.String(FlagRunID)
+	} else if c.NArg() >= 2 {
+		rid = c.Args().Get(1)
+	}
+
+	return wid, rid, nil
 }
 
 func listWorkflows(c *cli.Context, sdkClient sdkclient.Client, npt []byte, namespace string, query string) ([]interface{}, []byte, error) {
