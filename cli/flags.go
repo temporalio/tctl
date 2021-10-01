@@ -72,6 +72,7 @@ const (
 	FlagWorkflowExecutionTimeout          = "execution-timeout"
 	FlagWorkflowExecutionTimeoutWithAlias = FlagWorkflowExecutionTimeout + ", et"
 	FlagWorkflowRunTimeout                = "run-timeout"
+	FlagWorkflowRunTimeoutWithAlias       = FlagWorkflowRunTimeout + ", rt"
 	FlagWorkflowTaskTimeout               = "workflow-task-timeout"
 	FlagWorkflowTaskTimeoutWithAlias      = FlagWorkflowTaskTimeout + ", wtt"
 	FlagContextTimeout                    = "context-timeout"
@@ -311,7 +312,7 @@ var flagsForRunWorkflow = []cli.Flag{
 		Required: true,
 	},
 	&cli.IntFlag{
-		Name:  FlagWorkflowRunTimeout,
+		Name:  FlagWorkflowRunTimeoutWithAlias,
 		Usage: "Single workflow run timeout (seconds)",
 	},
 	&cli.IntFlag{
