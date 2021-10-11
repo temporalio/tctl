@@ -31,7 +31,19 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/temporalio/tctl-core/pkg/color"
-	"github.com/temporalio/tctl-core/pkg/config"
+)
+
+var (
+	rootKeys = []string{
+		"aliases",
+		"version",
+	}
+	envKeys = []string{
+		"namespace",
+		"address",
+	}
+	// validKeys is a list of valid configuration keys
+	validKeys = append(rootKeys, envKeys...)
 )
 
 func newConfigCommands() []*cli.Command {
@@ -55,15 +67,6 @@ func newConfigCommands() []*cli.Command {
 	}
 }
 
-var (
-	validKeys = []string{
-		"namespace",
-		"address",
-		"alias",
-		"version",
-	}
-)
-
 func GetValue(c *cli.Context) error {
 	if c.NArg() != 1 {
 		return fmt.Errorf("invalid number of args, expected 1: property name")
@@ -75,7 +78,7 @@ func GetValue(c *cli.Context) error {
 		return fmt.Errorf("unable to get property %v: %s", key, err)
 	}
 
-	val, err := config.Get(key)
+	val, err := tctlConfig.GetByEnvironment(c, key)
 	if err != nil {
 		return fmt.Errorf("unable to get property %v: %s", key, err)
 	}
@@ -95,7 +98,7 @@ func SetValue(c *cli.Context) error {
 		return fmt.Errorf("unable to set property %s: %s", key, err)
 	}
 
-	if err := config.Set(key, val); err != nil {
+	if err := tctlConfig.SetByEnvironment(c, key, val); err != nil {
 		return fmt.Errorf("unable to set property %s: %s", key, err)
 	}
 
