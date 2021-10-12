@@ -121,7 +121,6 @@ func NewCliApp() *cli.App {
 	app.Before = loadPlugins
 	app.After = stopPlugins
 	app.ExitErrHandler = handleError
-	useAliasCommands(app)
 
 	// set builder if not customized
 	if cFactory == nil {
@@ -135,6 +134,7 @@ func NewCliApp() *cli.App {
 			promptContinueWithoutConfig()
 		}
 	}
+	useAliasCommands(app)
 
 	return app
 }
