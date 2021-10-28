@@ -17,7 +17,7 @@ get started:
 
 ### Switching to updated tctl v1.14.0-alpha
 
-**Note** Switching to `tctl v1.14.0-alpha` is not recommended for production environments.
+**Note** Switching to `tctl v1.14.0-alpha` is not recommended on production environments.
 
 The package contains both `tctl v1.12.1` and the updated `tctl v1.14.0-alpha`. Version v1.14.0-alpha brings updated UX, commands and flags semantics, new features ([see details](https://github.com/temporalio/proposals/tree/master/cli)). Please expect more of upcoming changes in v1.14.0
 
