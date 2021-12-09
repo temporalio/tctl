@@ -1,6 +1,6 @@
 // The MIT License
 //
-// Copyright (c) 2020 Temporal Technologies Inc.  All rights reserved.
+// Copyright (c) 2021 Temporal Technologies Inc.  All rights reserved
 //
 // Copyright (c) 2020 Uber Technologies, Inc.
 //
@@ -28,34 +28,33 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"syscall"
 
 	"github.com/urfave/cli/v2"
 )
 
-func useAliasCommands(app *cli.App) {
-	aliases, err := tctlConfig.GetAliases()
-	if err != nil {
-		fmt.Print(err)
-		return
+// looks up a plugin binary in $PATH and returns the full path to the binary
+func lookupPlugin(plugin string) (string, error) {
+	if !strings.HasPrefix(plugin, "tctl-") {
+		return "", fmt.Errorf("plugin name should have 'tctl-' prefix")
 	}
 
-	app.CommandNotFound = func(ctx *cli.Context, cmdToFind string) {
-		found := false
-		for aliasCmd, aliasVal := range aliases {
-			if strings.Compare(cmdToFind, aliasCmd) == 0 {
-				found = true
+	path, exists := os.LookupEnv("PATH")
+	if !exists {
+		return "", nil
+	}
 
-				passedArgs := ctx.Args().Slice()
-				aliasArgs := strings.Split(aliasVal, " ")
-				args := append(passedArgs, aliasArgs...)
-
-				app.Run(args)
-				break
-			}
-		}
-
-		if !found {
-			fmt.Fprintf(os.Stderr, "%s is not a command. See '%s --help\n'", cmdToFind, ctx.App.Name)
+	paths := strings.Split(path, ":")
+	for _, p := range paths {
+		bin := fmt.Sprintf("%s/%s", p, plugin)
+		if _, err := os.Stat(bin); err == nil {
+			return bin, nil
 		}
 	}
+
+	return "", nil
+}
+
+func executePlugin(ctx *cli.Context, binPath string, args []string, envs []string) error {
+	return syscall.Exec(binPath, append([]string{binPath}, args...), envs)
 }
