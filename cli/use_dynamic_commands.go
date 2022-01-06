@@ -58,7 +58,7 @@ func lookupCmdInAliasCommands(ctx *cli.Context, cmd string) (string, error) {
 	}
 
 	for aliasCmd, aliasVal := range aliases {
-		if strings.Compare(cmd, aliasCmd) == 0 {
+		if cmd == aliasCmd {
 			return aliasVal, nil
 		}
 	}
