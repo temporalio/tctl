@@ -25,36 +25,11 @@
 package cli
 
 import (
-	"fmt"
-	"os"
-	"strings"
 	"syscall"
 
 	"github.com/urfave/cli/v2"
 )
 
-// looks up a plugin binary in $PATH and returns the full path to the binary
-func lookupPlugin(plugin string) (string, error) {
-	if !strings.HasPrefix(plugin, "tctl-") {
-		return "", fmt.Errorf("plugin name should have 'tctl-' prefix")
-	}
-
-	path, exists := os.LookupEnv("PATH")
-	if !exists {
-		return "", nil
-	}
-
-	paths := strings.Split(path, ":")
-	for _, p := range paths {
-		bin := fmt.Sprintf("%s/%s", p, plugin)
-		if _, err := os.Stat(bin); err == nil {
-			return bin, nil
-		}
-	}
-
-	return "", nil
-}
-
 func executePlugin(ctx *cli.Context, binPath string, args []string, envs []string) error {
-	return syscall.Exec(binPath, append([]string{binPath}, args...), envs)
+	return syscall.Exec(binPath, args, envs)
 }

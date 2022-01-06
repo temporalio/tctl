@@ -25,6 +25,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/urfave/cli/v2"
@@ -35,15 +36,16 @@ func useDynamicCommands(app *cli.App) {
 		// try execute as an alias command
 		cmdValue, err := lookupCmdInAliasCommands(ctx, cmdToFind)
 		if err == nil {
-			executeAliasCommand(ctx, app, cmdValue)
+			err = executeAliasCommand(ctx, app, cmdValue)
 			return
 		}
 
 		// execute external binary by path
-		path, err := lookupPlugin(cmdToFind)
+		pluginName := "tctl-" + cmdToFind
+		path, err := exec.LookPath(pluginName)
 		if err == nil {
-			os.Args = append([]string{path}, os.Args[1:]...)
-			executePlugin(ctx, path, os.Args, os.Environ())
+			os.Args = append([]string{pluginName}, os.Args[2:]...)
+			err = executePlugin(ctx, path, os.Args, os.Environ())
 		}
 
 		fmt.Fprintf(os.Stderr, "%s is not a command. See '%s --help\n'", cmdToFind, ctx.App.Name)
@@ -63,7 +65,7 @@ func lookupCmdInAliasCommands(ctx *cli.Context, cmd string) (string, error) {
 		}
 	}
 
-	return "", nil
+	return "", fmt.Errorf("alias command %s not found", cmd)
 }
 
 func executeAliasCommand(ctx *cli.Context, app *cli.App, aliasVal string) error {
