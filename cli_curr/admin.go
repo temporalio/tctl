@@ -508,7 +508,7 @@ func newAdminClusterCommands() []cli.Command {
 				cli.IntFlag{
 					Name:  FlagPageSize,
 					Value: 100,
-					Usage: "Page size (optional, default: 100)",
+					Usage: "Page size",
 				},
 			},
 			Action: func(c *cli.Context) {
