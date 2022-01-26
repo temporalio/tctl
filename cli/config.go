@@ -201,12 +201,6 @@ func createAlias(c *cli.Context) error {
 
 	fullKey := fmt.Sprintf("%s.%s", config.KeyAlias, command)
 
-	// aliases, error := tctlConfig.GetAliases()
-	// if error != nil {
-	// 	return error
-	// }
-	// aliases[command] = alias
-
 	if err := tctlConfig.Set(c, fullKey, alias); err != nil {
 		return fmt.Errorf("unable to set property %s: %s", config.KeyAlias, err)
 	}
