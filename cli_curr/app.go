@@ -250,10 +250,13 @@ func loadPlugins(c *cli.Context) error {
 	dcRemote := c.String(FlagRemoteDataConverter)
 	if dcRemote != "" {
 		dataconverter.SetCurrent(
-			converter.NewRemoteEncoderDataConverter(
-				converter.RemoteEncoderDataConverterOptions{
-					Endpoint: dcRemote,
-				},
+			converter.NewEncodingDataConverter(
+				converter.GetDefaultDataConverter(),
+				converter.NewRemotePayloadEncoder(
+					converter.RemotePayloadEncoderOptions{
+						Endpoint: dcRemote,
+					},
+				),
 			),
 		)
 	}

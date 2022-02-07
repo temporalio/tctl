@@ -2,7 +2,7 @@ module github.com/temporalio/tctl
 
 go 1.17
 
-replace go.temporal.io/sdk => github.com/temporalio/sdk-go v1.13.1-0.20220206141821-eb0f2d2a6719
+replace go.temporal.io/sdk => github.com/temporalio/sdk-go v1.13.1-0.20220207161017-b2a682807bad
 
 require (
 	github.com/fatih/color v1.13.0
