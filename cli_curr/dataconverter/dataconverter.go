@@ -22,16 +22,18 @@
 
 package dataconverter
 
-import "go.temporal.io/sdk/converter"
+import (
+	"go.temporal.io/sdk/converter"
+)
 
 var (
-	dataConverter = converter.GetDefaultDataConverter()
+	defaultDataConverter = converter.GetDefaultDataConverter()
 )
 
 func SetCurrent(dc converter.DataConverter) {
-	dataConverter = dc
+	defaultDataConverter = dc
 }
 
 func GetCurrent() converter.DataConverter {
-	return dataConverter
+	return defaultDataConverter
 }

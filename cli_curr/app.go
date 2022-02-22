@@ -34,6 +34,8 @@ import (
 	"github.com/temporalio/tctl/cli_curr/headersprovider"
 	"github.com/temporalio/tctl/cli_curr/plugin"
 	"go.temporal.io/server/common/headers"
+
+	"go.temporal.io/sdk/converter"
 )
 
 // SetFactory is used to set the ClientFactory global
@@ -110,6 +112,12 @@ func NewCliApp() *cli.App {
 			Value:  "",
 			Usage:  "Data converter plugin executable name",
 			EnvVar: "TEMPORAL_CLI_PLUGIN_DATA_CONVERTER",
+		},
+		&cli.StringFlag{
+			Name:   FlagRemoteDataConverter,
+			Value:  "",
+			Usage:  "Remote data converter endpoint",
+			EnvVar: "TEMPORAL_CLI_REMOTE_DATA_CONVERTER",
 		},
 	}
 	app.Commands = []cli.Command{
@@ -239,6 +247,17 @@ func NewCliApp() *cli.App {
 }
 
 func loadPlugins(c *cli.Context) error {
+	dcRemote := c.String(FlagRemoteDataConverter)
+	if dcRemote != "" {
+		dataconverter.SetCurrent(
+			converter.NewRemoteEncoderDataConverter(
+				converter.RemoteEncoderDataConverterOptions{
+					Endpoint: dcRemote,
+				},
+			),
+		)
+	}
+
 	dcPlugin := c.String(FlagDataConverterPlugin)
 	if dcPlugin != "" {
 		dataConverter, err := plugin.NewDataConverterPlugin(dcPlugin)
