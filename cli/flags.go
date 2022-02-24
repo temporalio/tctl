@@ -219,6 +219,7 @@ var (
 	FlagInputDirectory                = "input-directory"
 	FlagAutoConfirm                   = "auto-confirm"
 	FlagDataConverterPlugin           = "data-converter-plugin"
+	FlagRemoteDataConverterEndpoint   = "remote-data-converter-endpoint"
 	FlagWebURL                        = "web-ui-url"
 	FlagHeadersProviderPlugin         = "headers-provider-plugin"
 	FlagHeadersProviderPluginOptions  = "headers-provider-plugin-options"

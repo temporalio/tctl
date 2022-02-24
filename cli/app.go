@@ -32,6 +32,7 @@ import (
 	"strings"
 
 	"github.com/urfave/cli/v2"
+	"go.temporal.io/sdk/converter"
 
 	"github.com/temporalio/tctl-kit/pkg/color"
 	"github.com/temporalio/tctl/cli/dataconverter"
@@ -117,6 +118,12 @@ func NewCliApp() *cli.App {
 			EnvVars: []string{"TEMPORAL_CLI_PLUGIN_DATA_CONVERTER"},
 		},
 		&cli.StringFlag{
+			Name:    FlagRemoteDataConverterEndpoint,
+			Value:   "",
+			Usage:   "Remote data converter endpoint",
+			EnvVars: []string{"TEMPORAL_CLI_REMOTE_DATA_CONVERTER_ENDPOINT"},
+		},
+		&cli.StringFlag{
 			Name:  color.FlagColor,
 			Usage: fmt.Sprintf("when to use color: %v, %v, %v.", color.Auto, color.Always, color.Never),
 			Value: string(color.Auto),
@@ -145,6 +152,18 @@ func NewCliApp() *cli.App {
 }
 
 func loadPlugins(ctx *cli.Context) error {
+	dcRemote := ctx.String(FlagRemoteDataConverterEndpoint)
+	if dcRemote != "" {
+		dataconverter.SetCurrent(
+			converter.NewRemoteDataConverter(
+				converter.GetDefaultDataConverter(),
+				converter.RemoteDataConverterOptions{
+					Endpoint: dcRemote,
+				},
+			),
+		)
+	}
+
 	dcPlugin := ctx.String(FlagDataConverterPlugin)
 	if dcPlugin != "" {
 		dataConverter, err := plugin.NewDataConverterPlugin(dcPlugin)

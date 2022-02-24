@@ -114,10 +114,10 @@ func NewCliApp() *cli.App {
 			EnvVar: "TEMPORAL_CLI_PLUGIN_DATA_CONVERTER",
 		},
 		&cli.StringFlag{
-			Name:   FlagRemoteDataConverter,
+			Name:   FlagRemoteDataConverterEndpoint,
 			Value:  "",
 			Usage:  "Remote data converter endpoint",
-			EnvVar: "TEMPORAL_CLI_REMOTE_DATA_CONVERTER",
+			EnvVar: "TEMPORAL_CLI_REMOTE_DATA_CONVERTER_ENDPOINT",
 		},
 	}
 	app.Commands = []cli.Command{
@@ -247,16 +247,14 @@ func NewCliApp() *cli.App {
 }
 
 func loadPlugins(c *cli.Context) error {
-	dcRemote := c.String(FlagRemoteDataConverter)
+	dcRemote := c.String(FlagRemoteDataConverterEndpoint)
 	if dcRemote != "" {
 		dataconverter.SetCurrent(
-			converter.NewEncodingDataConverter(
+			converter.NewRemoteDataConverter(
 				converter.GetDefaultDataConverter(),
-				converter.NewRemotePayloadEncoder(
-					converter.RemotePayloadEncoderOptions{
-						Endpoint: dcRemote,
-					},
-				),
+				converter.RemoteDataConverterOptions{
+					Endpoint: dcRemote,
+				},
 			),
 		)
 	}

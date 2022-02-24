@@ -480,8 +480,8 @@ github.com/subosito/gotenv v1.2.0 h1:Slr1R9HxAlEKefgq5jn9U+DnETlIUa6HfgEzj0g5d7s
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/temporalio/ringpop-go v0.0.0-20211012191444-6f91b5915e95 h1:8G34e73qtrkG9sDFcSC8uot0np3e6BLoMZxleTcpUiA=
 github.com/temporalio/ringpop-go v0.0.0-20211012191444-6f91b5915e95/go.mod h1:Ek9J8CAfI1IwVSqHpTOgj7FjzRSJ5SM/ud52eCmkhsw=
-github.com/temporalio/sdk-go v1.13.1-0.20220207161017-b2a682807bad h1:XqKzt8UtIaAg5OziNle+jzTl9ePHBP20U5oTAWHtPyU=
-github.com/temporalio/sdk-go v1.13.1-0.20220207161017-b2a682807bad/go.mod h1:TCof7U/xas2FyDnx/UUEv4c/O/S41Lnhva+6JVer+Jo=
+github.com/temporalio/sdk-go v1.13.2-0.20220222144957-856f5c2751d5 h1:J1RGWPaB3YVxs1AM+utFjpEWiiMCvtgFW2+Xjpysqig=
+github.com/temporalio/sdk-go v1.13.2-0.20220222144957-856f5c2751d5/go.mod h1:TCof7U/xas2FyDnx/UUEv4c/O/S41Lnhva+6JVer+Jo=
 github.com/temporalio/tctl-kit v0.0.0-20211220044822-28c2391a9ce4 h1:NCIx/Wo3uIX+cHqZcqPWfmMh9Y9NPghE6eGQNJBb65g=
 github.com/temporalio/tctl-kit v0.0.0-20211220044822-28c2391a9ce4/go.mod h1:nwajnpE9EUnMfoXt58tObJL0S4SdYwoWor6sdm89Iug=
 github.com/twmb/murmur3 v1.1.5/go.mod h1:Qq/R7NUyOfr65zD+6Q5IHKsJLwP7exErjN6lyyq3OSQ=

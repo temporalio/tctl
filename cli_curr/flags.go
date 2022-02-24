@@ -228,7 +228,7 @@ const (
 	FlagUpperShardBound                       = "upper_shard_bound"
 	FlagInputDirectory                        = "input_directory"
 	FlagAutoConfirm                           = "auto_confirm"
-	FlagRemoteDataConverter                   = "remote_data_converter"
+	FlagRemoteDataConverterEndpoint           = "remote_data_converter_endpoint"
 	FlagDataConverterPlugin                   = "data_converter_plugin"
 	FlagDataConverterPluginWithAlias          = FlagDataConverterPlugin + ", dcp"
 	FlagWebURL                                = "web_ui_url"
