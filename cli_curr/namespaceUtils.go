@@ -187,16 +187,6 @@ var (
 			Usage: "Optional service zone for loading service configuration",
 		},
 	}
-
-	adminUpdateNamespaceFlags = append(
-		updateNamespaceFlags,
-		adminNamespaceCommonFlags...,
-	)
-
-	adminDescribeNamespaceFlags = append(
-		updateNamespaceFlags,
-		adminNamespaceCommonFlags...,
-	)
 )
 
 func initializeFrontendClient(
@@ -298,6 +288,7 @@ func initializeClusterMetadata(
 		clusterMetadata.MasterClusterName,
 		clusterMetadata.CurrentClusterName,
 		clusterMetadata.ClusterInformation,
+		nil,
 		nil,
 		log.NewNoopLogger(),
 	)
