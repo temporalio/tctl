@@ -66,7 +66,7 @@ func newWorkflowCommands() []*cli.Command {
 			},
 		},
 		{
-			Name:  "listarchived",
+			Name:  "list-archived",
 			Usage: "list archived workflow executions",
 			Flags: append(flagsForListArchived, flags.FlagsForPaginationAndRendering...),
 			Action: func(c *cli.Context) error {
