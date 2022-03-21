@@ -314,7 +314,7 @@ var flagsForRunWorkflow = []cli.Flag{
 	&cli.StringFlag{
 		Name: FlagWorkflowIDReusePolicy,
 		Usage: "Configure if the same workflow Id is allowed for use in new workflow execution. " +
-			"Options: AllowDuplicate, AllowDuplicateFailedOnly, RejectDuplicate",
+			"Options: AllowDuplicate, AllowDuplicateFailedOnly, RejectDuplicate, TerminateIfRunning",
 	},
 	&cli.StringSliceFlag{
 		Name:    FlagInput,
