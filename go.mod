@@ -2,6 +2,8 @@ module github.com/temporalio/tctl
 
 go 1.17
 
+replace go.temporal.io/sdk => github.com/temporalio/sdk-go v1.14.1-0.20220322131744-55cf584de5c7
+
 require (
 	github.com/fatih/color v1.13.0
 	github.com/gogo/protobuf v1.3.2
