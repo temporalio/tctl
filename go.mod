@@ -1,6 +1,6 @@
 module github.com/temporalio/tctl
 
-go 1.17
+go 1.18
 
 replace go.temporal.io/sdk => github.com/temporalio/sdk-go v1.14.1-0.20220322131744-55cf584de5c7
 
