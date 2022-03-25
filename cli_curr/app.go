@@ -118,15 +118,15 @@ func NewCliApp() *cli.App {
 			EnvVar: "TEMPORAL_CLI_PLUGIN_DATA_CONVERTER",
 		},
 		cli.StringFlag{
-			Name:   FlagRemoteCodecEndpoint,
+			Name:   FlagCodecEndpoint,
 			Value:  "",
-			Usage:  "Remote Codec Server Endpoint",
+			Usage:  "Codec Server Endpoint",
 			EnvVar: "TEMPORAL_CLI_REMOTE_CODEC_ENDPOINT",
 		},
 		cli.StringFlag{
-			Name:   FlagRemoteCodecAuth,
+			Name:   FlagCodecAuth,
 			Value:  "",
-			Usage:  "Authorization header to set for Remote Codec requests",
+			Usage:  "Authorization header to set for requests to Codec Server",
 			EnvVar: "TEMPORAL_CLI_REMOTE_CODEC_AUTH",
 		},
 	}
@@ -257,12 +257,12 @@ func NewCliApp() *cli.App {
 }
 
 func configureSDK(c *cli.Context) error {
-	endpoint := c.String(FlagRemoteCodecEndpoint)
+	endpoint := c.String(FlagCodecEndpoint)
 	if endpoint != "" {
 		dataconverter.SetRemoteEndpoint(
 			endpoint,
 			c.String(FlagNamespace),
-			c.String(FlagRemoteCodecAuth),
+			c.String(FlagCodecAuth),
 		)
 	}
 
