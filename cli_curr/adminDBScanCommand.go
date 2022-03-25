@@ -238,8 +238,7 @@ func AdminDBScan(c *cli.Context) {
 	defer session.Close()
 	scanOutputDirectories := createScanOutputDirectories()
 
-	ctx, cancel := newContext(c)
-	defer cancel()
+	ctx := context.TODO()
 
 	reports := make(chan *ShardScanReport)
 	for i := int32(0); i < scanWorkerCount; i++ {
