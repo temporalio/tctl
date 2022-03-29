@@ -121,13 +121,13 @@ func NewCliApp() *cli.App {
 			Name:   FlagCodecEndpoint,
 			Value:  "",
 			Usage:  "Codec Server Endpoint",
-			EnvVar: "TEMPORAL_CLI_REMOTE_CODEC_ENDPOINT",
+			EnvVar: "TEMPORAL_CLI_CODEC_ENDPOINT",
 		},
 		cli.StringFlag{
 			Name:   FlagCodecAuth,
 			Value:  "",
 			Usage:  "Authorization header to set for requests to Codec Server",
-			EnvVar: "TEMPORAL_CLI_REMOTE_CODEC_AUTH",
+			EnvVar: "TEMPORAL_CLI_CODEC_AUTH",
 		},
 	}
 	app.Commands = []cli.Command{
