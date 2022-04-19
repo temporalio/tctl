@@ -1,9 +1,10 @@
 before:
   hooks:
     - go mod download
+
 builds:
   - id: "tctl"
-    dir: cmd
+    dir: cmd/tctl
     binary: tctl
     env:
       - CGO_ENABLED=0
@@ -14,14 +15,13 @@ builds:
     goarch:
       - amd64
       - arm64
+
 checksum:
   name_template: 'checksums.txt'
   algorithm: sha256
-snapshot:
-  name_template: "{{ .Tag }}-next" 
+
 changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
+  skip: true
+
+announce:
+  skip: "true"
