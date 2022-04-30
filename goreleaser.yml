@@ -2,6 +2,16 @@ before:
   hooks:
     - go mod download
 
+archives:
+  - id: default
+    builds:
+      - tctl
+      - tctl-authorization-plugin
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+
 builds:
   - id: "tctl"
     dir: cmd/tctl
@@ -16,8 +26,21 @@ builds:
       - amd64
       - arm64
 
+  - id: "tctl-authorization-plugin"
+    dir: cmd/plugins/tctl-authorization-plugin
+    binary: tctl-authorization-plugin
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
   algorithm: sha256
 
 changelog:
