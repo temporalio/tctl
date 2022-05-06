@@ -63,6 +63,24 @@ import (
 	"go.temporal.io/server/service/history/workflow"
 )
 
+func startWorkflowBaseArgs(c *cli.Context) (
+	taskQueue string,
+	workflowType string,
+	et, rt, dt int,
+	wid string,
+) {
+	taskQueue = c.String(FlagTaskQueue)
+	workflowType = c.String(FlagWorkflowType)
+	et = c.Int(FlagWorkflowExecutionTimeout)
+	rt = c.Int(FlagWorkflowRunTimeout)
+	dt = c.Int(FlagWorkflowTaskTimeout)
+	wid = c.String(FlagWorkflowID)
+	if len(wid) == 0 {
+		wid = uuid.New()
+	}
+	return
+}
+
 // StartWorkflow starts a new workflow execution and optionally prints progress
 func StartWorkflow(c *cli.Context, printProgress bool) error {
 	sdkClient, err := getSDKClient(c)
@@ -74,15 +92,9 @@ func StartWorkflow(c *cli.Context, printProgress bool) error {
 	if err != nil {
 		return err
 	}
-	taskQueue := c.String(FlagTaskQueue)
-	workflowType := c.String(FlagWorkflowType)
-	et := c.Int(FlagWorkflowExecutionTimeout)
-	rt := c.Int(FlagWorkflowRunTimeout)
-	dt := c.Int(FlagWorkflowTaskTimeout)
-	wid := c.String(FlagWorkflowID)
-	if len(wid) == 0 {
-		wid = uuid.New()
-	}
+
+	taskQueue, workflowType, et, rt, dt, wid := startWorkflowBaseArgs(c)
+
 	reusePolicy := defaultWorkflowIDReusePolicy
 	if c.IsSet(FlagWorkflowIDReusePolicy) {
 		reusePolicyInt, err := stringToEnum(c.String(FlagWorkflowIDReusePolicy), enumspb.WorkflowIdReusePolicy_value)
@@ -159,29 +171,6 @@ func StartWorkflow(c *cli.Context, printProgress bool) error {
 	}
 
 	return nil
-}
-
-func unmarshalInputsFromCLI(c *cli.Context) ([]interface{}, error) {
-	jsonsRaw, err := readJSONInputs(c)
-	if err != nil {
-		return nil, err
-	}
-
-	var result []interface{}
-	for _, jsonRaw := range jsonsRaw {
-		if jsonRaw == nil {
-			result = append(result, nil)
-		} else {
-			var j interface{}
-			if err := json.Unmarshal(jsonRaw, &j); err != nil {
-				return nil, fmt.Errorf("input is not valid JSON: %s", err)
-			}
-			result = append(result, j)
-		}
-
-	}
-
-	return result, nil
 }
 
 func formatInputsForDisplay(inputs []interface{}) string {
