@@ -48,25 +48,33 @@ import (
 	sdkmocks "go.temporal.io/sdk/mocks"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
+	"go.temporal.io/server/api/adminservice/v1"
+	"go.temporal.io/server/api/adminservicemock/v1"
 	"go.temporal.io/server/common/payloads"
 	"go.temporal.io/server/common/primitives/timestamp"
 )
 
 type cliAppSuite struct {
 	suite.Suite
-	app            *cli.App
-	mockCtrl       *gomock.Controller
-	frontendClient *workflowservicemock.MockWorkflowServiceClient
-	sdkClient      *sdkmocks.Client
+	app               *cli.App
+	mockCtrl          *gomock.Controller
+	frontendClient    *workflowservicemock.MockWorkflowServiceClient
+	serverAdminClient *adminservicemock.MockAdminServiceClient
+	sdkClient         *sdkmocks.Client
 }
 
 type clientFactoryMock struct {
-	frontendClient workflowservice.WorkflowServiceClient
-	sdkClient      *sdkmocks.Client
+	frontendClient    workflowservice.WorkflowServiceClient
+	serverAdminClient adminservice.AdminServiceClient
+	sdkClient         *sdkmocks.Client
 }
 
 func (m *clientFactoryMock) FrontendClient(c *cli.Context) workflowservice.WorkflowServiceClient {
 	return m.frontendClient
+}
+
+func (m *clientFactoryMock) AdminClient(c *cli.Context) adminservice.AdminServiceClient {
+	return m.serverAdminClient
 }
 
 func (m *clientFactoryMock) SDKClient(c *cli.Context, namespace string) sdkclient.Client {
@@ -98,10 +106,12 @@ func (s *cliAppSuite) SetupTest() {
 	s.mockCtrl = gomock.NewController(s.T())
 
 	s.frontendClient = workflowservicemock.NewMockWorkflowServiceClient(s.mockCtrl)
+	s.serverAdminClient = adminservicemock.NewMockAdminServiceClient(s.mockCtrl)
 	s.sdkClient = &sdkmocks.Client{}
 	SetFactory(&clientFactoryMock{
-		frontendClient: s.frontendClient,
-		sdkClient:      s.sdkClient,
+		frontendClient:    s.frontendClient,
+		serverAdminClient: s.serverAdminClient,
+		sdkClient:         s.sdkClient,
 	})
 }
 

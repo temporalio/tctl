@@ -43,6 +43,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"go.temporal.io/api/workflowservice/v1"
 	sdkclient "go.temporal.io/sdk/client"
+	"go.temporal.io/server/api/adminservice/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -66,6 +67,7 @@ type HttpGetter interface {
 // ClientFactory is used to construct rpc clients
 type ClientFactory interface {
 	FrontendClient(c *cli.Context) workflowservice.WorkflowServiceClient
+	AdminClient(c *cli.Context) adminservice.AdminServiceClient
 	SDKClient(c *cli.Context, namespace string) sdkclient.Client
 	HealthClient(c *cli.Context) healthpb.HealthClient
 }
@@ -88,6 +90,13 @@ func (b *clientFactory) FrontendClient(c *cli.Context) workflowservice.WorkflowS
 	connection, _ := b.createGRPCConnection(c)
 
 	return workflowservice.NewWorkflowServiceClient(connection)
+}
+
+// AdminClient builds an admin client.
+func (b *clientFactory) AdminClient(c *cli.Context) adminservice.AdminServiceClient {
+	connection, _ := b.createGRPCConnection(c)
+
+	return adminservice.NewAdminServiceClient(connection)
 }
 
 // SDKClient builds an SDK client.

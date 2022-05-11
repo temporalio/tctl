@@ -229,6 +229,21 @@ var (
 	FlagPort                          = "port"
 	FlagEnableConnection              = "enable-connection"
 	FlagFollow                        = "follow"
+	FlagMore                          = "more"
+	FlagElasticsearchURL              = "url"
+	FlagMinEventVersion               = "min-event-version"
+	FlagMaxEventVersion               = "max-event-version"
+	FlagMinTaskID                     = "min-task-id"
+	FlagMaxTaskID                     = "max-task-id"
+	FlagSkipSchemaUpdate              = "skip-schema-update"
+	FlagType                          = "type"
+	FlagElasticsearchIndex            = "index"
+	FlagElasticsearchUsername         = "es-username"
+	FlagElasticsearchPassword         = "es-password"
+	FlagFrontendAddress               = "frontend-address"
+	FlagConnectionEnable              = "enable-connection"
+	FlagDLQType                       = "dlq-type"
+	FlagMaxMessageCount               = "max-message-count"
 
 	FlagProtoType  = "type"
 	FlagHexData    = "hex-data"
@@ -447,3 +462,98 @@ var flagsForStackTraceQuery = append(flagsForExecution, []cli.Flag{
 		Usage:   "Optional flag to reject queries based on workflow state. Valid values are \"not_open\" and \"not_completed_cleanly\"",
 	},
 }...)
+
+func getDBFlags() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:  FlagDBEngine,
+			Value: "cassandra",
+			Usage: "Type of the DB engine to use (cassandra, mysql, postgres..)",
+		},
+		&cli.StringFlag{
+			Name:  FlagDBAddress,
+			Value: "127.0.0.1",
+			Usage: "persistence address",
+		},
+		&cli.IntFlag{
+			Name:  FlagDBPort,
+			Value: 9042,
+			Usage: "persistence port",
+		},
+		&cli.StringFlag{
+			Name:  FlagUsername,
+			Usage: "DB username",
+		},
+		&cli.StringFlag{
+			Name:  FlagPassword,
+			Usage: "DB password",
+		},
+		&cli.StringFlag{
+			Name:  FlagKeyspace,
+			Value: "temporal",
+			Usage: "DB keyspace",
+		},
+		&cli.BoolFlag{
+			Name:  FlagEnableTLS,
+			Usage: "enable TLS over the DB connection",
+		},
+		&cli.StringFlag{
+			Name:  FlagTLSCertPath,
+			Usage: "DB tls client cert path (tls must be enabled)",
+		},
+		&cli.StringFlag{
+			Name:  FlagTLSKeyPath,
+			Usage: "DB tls client key path (tls must be enabled)",
+		},
+		&cli.StringFlag{
+			Name:  FlagTLSCaPath,
+			Usage: "DB tls client ca path (tls must be enabled)",
+		},
+		&cli.StringFlag{
+			Name:  FlagTLSServerName,
+			Usage: "DB tls server name (tls must be enabled)",
+		},
+		&cli.BoolFlag{
+			Name:  FlagTLSDisableHostVerification,
+			Usage: "DB tls verify hostname and server cert (tls must be enabled)",
+		},
+	}
+}
+
+func getDBAndESFlags() []cli.Flag {
+	return append(getDBFlags(), getESFlags(true)...)
+}
+
+func getESFlags(index bool) []cli.Flag {
+	flags := []cli.Flag{
+		&cli.StringFlag{
+			Name:  FlagElasticsearchURL,
+			Value: "http://127.0.0.1:9200",
+			Usage: "URL of Elasticsearch cluster",
+		},
+		&cli.StringFlag{
+			Name:  FlagElasticsearchUsername,
+			Value: "",
+			Usage: "Username for Elasticsearch cluster",
+		},
+		&cli.StringFlag{
+			Name:  FlagElasticsearchPassword,
+			Value: "",
+			Usage: "Password for Elasticsearch cluster",
+		},
+		&cli.StringFlag{
+			Name:  FlagVersion,
+			Value: "v7",
+			Usage: "Version of Elasticsearch cluster: v6 or v7 (default)",
+		},
+	}
+	if index {
+		flags = append(flags,
+			&cli.StringFlag{
+				Name:  FlagElasticsearchIndex,
+				Usage: "Elasticsearch index name",
+			},
+		)
+	}
+	return flags
+}

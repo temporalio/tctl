@@ -51,5 +51,11 @@ var tctlCommands = []*cli.Command{
 		Usage:       "Configure tctl",
 		Subcommands: newConfigCommands(),
 	},
+	{
+		Name:        "admin",
+		Aliases:     []string{"adm"},
+		Usage:       "Run admin operation",
+		Subcommands: newAdminCommands(),
+	},
 	newAliasCommand(),
 }
