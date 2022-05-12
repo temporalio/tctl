@@ -407,54 +407,6 @@ func newESClient(c *cli.Context) (esclient.CLIClient, error) {
 	return client, nil
 }
 
-// AdminGetNamespaceIDOrName map namespace
-func AdminGetNamespaceIDOrName(c *cli.Context) error {
-	namespaceID := c.String(FlagNamespaceID)
-	namespace := c.String(FlagNamespace)
-	if len(namespaceID) == 0 && len(namespace) == 0 {
-		return fmt.Errorf("Need either namespace or namespaceId")
-	}
-
-	session, err := connectToCassandra(c)
-	if err != nil {
-		return err
-	}
-
-	if len(namespaceID) > 0 {
-		tmpl := "select namespace from namespaces where id = ? "
-		query := session.Query(tmpl, namespaceID)
-		res, err := readOneRow(query)
-		if err != nil {
-			return fmt.Errorf("readOneRow: %s", err)
-		}
-		namespaceName := res["name"].(string)
-		fmt.Printf("namespace for namespaceId %v is %v \n", namespaceID, namespaceName)
-	} else {
-		tmpl := "select namespace from namespaces_by_name where name = ?"
-		tmplV2 := "select namespace from namespaces where namespaces_partition=0 and name = ?"
-
-		query := session.Query(tmpl, namespace)
-		res, err := readOneRow(query)
-		if err != nil {
-			fmt.Printf("v1 return error: %v , trying v2...\n", err)
-
-			query := session.Query(tmplV2, namespace)
-			res, err := readOneRow(query)
-			if err != nil {
-				return fmt.Errorf("readOneRow for v2: %s", err)
-			}
-			namespace := res["namespace"].(map[string]interface{})
-			namespaceID := gocql.UUIDToString(namespace["id"])
-			fmt.Printf("namespaceId for namespace %v is %v \n", namespace, namespaceID)
-		} else {
-			namespace := res["namespace"].(map[string]interface{})
-			namespaceID := gocql.UUIDToString(namespace["id"])
-			fmt.Printf("namespaceId for namespace %v is %v \n", namespace, namespaceID)
-		}
-	}
-	return nil
-}
-
 // AdminGetShardID get shardID
 func AdminGetShardID(c *cli.Context) error {
 	namespaceID := c.String(FlagNamespaceID)
