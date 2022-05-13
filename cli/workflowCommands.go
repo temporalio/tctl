@@ -925,7 +925,7 @@ func ShowHistory(c *cli.Context) error {
 	wid := c.String(FlagWorkflowID)
 	rid := c.String(FlagRunID)
 
-	follow := c.Bool(FlagFollow)
+	follow := c.Bool(output.FlagFollow)
 
 	return printWorkflowProgress(c, wid, rid, follow)
 }
