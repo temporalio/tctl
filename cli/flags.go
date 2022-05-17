@@ -380,7 +380,7 @@ var flagsForWorkflowFiltering = []cli.Flag{
 	&cli.BoolFlag{
 		Name:    FlagArchive,
 		Aliases: FlagArchiveAlias,
-		Usage:   "List archived workflow executions",
+		Usage:   "List archived workflow executions (EXPERIMENTAL)",
 	},
 }
 
