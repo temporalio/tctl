@@ -329,7 +329,7 @@ var flagsForRunWorkflow = []cli.Flag{
 	&cli.StringSliceFlag{
 		Name:    FlagInput,
 		Aliases: FlagInputAlias,
-		Usage:   "Optional input for the workflow in JSON format. Pass \"null\" for null values",
+		Usage:   "Optional input for the Workflow in JSON format. Pass \"null\" for null values",
 	},
 	&cli.StringFlag{
 		Name:    FlagInputFile,
