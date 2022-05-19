@@ -179,7 +179,7 @@ func newWorkflowCommands() []*cli.Command {
 				},
 				&cli.StringFlag{
 					Name: FlagResetReapplyType,
-					Usage: "Types of events to reapply after the reset point: " +
+					Usage: "Event types to reapply after the reset point: " +
 						strings.Join(mapKeysToArray(resetReapplyTypesMap), ",") + ". (default: All)",
 				},
 				&cli.StringFlag{
