@@ -169,7 +169,7 @@ func newWorkflowCommands() []*cli.Command {
 				},
 				&cli.StringFlag{
 					Name:     FlagReason,
-					Usage:    "Reason for resetting the workflow execution",
+					Usage:    "Reason for resetting the Workflow Execution",
 					Required: true,
 				},
 				&cli.StringFlag{
