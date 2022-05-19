@@ -237,7 +237,7 @@ func newWorkflowCommands() []*cli.Command {
 				},
 				&cli.BoolFlag{
 					Name:  FlagNonDeterministic,
-					Usage: "Reset workflow execution only if its last event is WorkflowTaskFailed with a nondeterministic error",
+					Usage: "Reset Workflow Execution only if its last Event is WorkflowTaskFailed with a nondeterministic error",
 				},
 				&cli.StringFlag{
 					Name:     FlagResetType,
