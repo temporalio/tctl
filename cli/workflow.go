@@ -226,7 +226,7 @@ func newWorkflowCommands() []*cli.Command {
 				},
 				&cli.BoolFlag{
 					Name:  FlagSkipCurrentOpen,
-					Usage: "Skip a workflow execution if the current Run is open for the same Workflow Id as the base Run",
+					Usage: "Skip a Workflow Execution if the current Run is open for the same Workflow Id as the base Run",
 				},
 				&cli.BoolFlag{
 					Name: FlagSkipBaseIsNotCurrent,
