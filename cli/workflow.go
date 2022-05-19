@@ -152,7 +152,7 @@ func newWorkflowCommands() []*cli.Command {
 				&cli.StringFlag{
 					Name:    FlagReason,
 					Aliases: FlagReasonAlias,
-					Usage:   "Reason for terminating the workflow execution",
+					Usage:   "Reason for terminating the Workflow Execution",
 				},
 			}...),
 			Action: func(c *cli.Context) error {
