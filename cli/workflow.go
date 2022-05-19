@@ -131,7 +131,7 @@ func newWorkflowCommands() []*cli.Command {
 		},
 		{
 			Name:  "count",
-			Usage: "Count workflow executions (requires ElasticSearch to be enabled)",
+			Usage: "Count Workflow Executions (requires ElasticSearch to be enabled)",
 			Flags: getFlagsForCount(),
 			Action: func(c *cli.Context) error {
 				return CountWorkflow(c)
