@@ -147,7 +147,7 @@ func newWorkflowCommands() []*cli.Command {
 		},
 		{
 			Name:  "terminate",
-			Usage: "Terminate a workflow execution",
+			Usage: "Terminate a Workflow Execution",
 			Flags: append(flagsForExecution, []cli.Flag{
 				&cli.StringFlag{
 					Name:    FlagReason,
@@ -198,7 +198,7 @@ func newWorkflowCommands() []*cli.Command {
 				&cli.StringFlag{
 					Name:    FlagListQuery,
 					Aliases: FlagListQueryAlias,
-					Usage:   "Visibility query of Search Attributes describing the Workflow Executions to reset",
+					Usage:   "Visibility query of Search Attributes describing the Workflow Executions to reset. See https://docs.temporal.io/docs/tctl/workflow/list#--query",
 				}, &cli.StringFlag{
 					Name:    FlagInputFile,
 					Aliases: FlagInputFileAlias,
