@@ -26,7 +26,6 @@ package cli
 
 import (
 	"github.com/temporalio/tctl-kit/pkg/output"
-	"github.com/urfave/cli"
 )
 
 // Flags used to specify cli command line arguments
