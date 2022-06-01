@@ -268,12 +268,10 @@ func (s *cliAppSuite) TestStartWorkflow() {
 	s.sdkClient.AssertCalled(s.T(), "ExecuteWorkflow", mock.Anything, hasNoSearchAttributes, mock.Anything, mock.Anything)
 }
 
-func (s *cliAppSuite) TestRunWorkflow_SearchAttributes() {
+func (s *cliAppSuite) TestStartWorkflow_SearchAttributes() {
 	s.sdkClient.On("ExecuteWorkflow", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(workflowRun(), nil)
-	s.sdkClient.On("GetWorkflowHistory", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(historyEventIterator()).Once()
-
 	// start with basic search attributes
-	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "run", "--task-queue", "testTaskQueue", "--type", "testWorkflowType",
+	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "start", "--task-queue", "testTaskQueue", "--type", "testWorkflowType",
 		"--search-attribute-key", "k1", "--search-attribute-value", "\"v1\"", "--search-attribute-key", "k2", "--search-attribute-value", "\"v2\""})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
@@ -286,7 +284,6 @@ func (s *cliAppSuite) TestRunWorkflow_SearchAttributes() {
 	s.sdkClient.AssertCalled(s.T(), "ExecuteWorkflow", mock.Anything, hasCorrectSearchAttributes, mock.Anything, mock.Anything)
 
 	s.sdkClient.On("ExecuteWorkflow", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(workflowRun(), nil)
-	s.sdkClient.On("GetWorkflowHistory", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(historyEventIterator()).Once()
 
 	// TODO: test json search attributes once we know how to they'll be specified (--search-attribute-json?)
 }
