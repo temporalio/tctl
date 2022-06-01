@@ -43,7 +43,7 @@ func newWorkflowCommands() []*cli.Command {
 		},
 		{
 			Name:  "execute",
-			Usage: "Start a new workflow execution and print progress",
+			Usage: "Start a new workflow execution and await its completion, prints progress",
 			Flags: append(flagsForStartWorkflow, flags.FlagsForPaginationAndRendering...),
 			Action: func(c *cli.Context) error {
 				return StartWorkflow(c, true)
