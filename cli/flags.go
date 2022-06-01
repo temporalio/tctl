@@ -26,7 +26,7 @@ package cli
 
 import (
 	"github.com/temporalio/tctl-kit/pkg/output"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli"
 )
 
 // Flags used to specify cli command line arguments
@@ -145,7 +145,7 @@ var (
 	FlagClustersAlias                 = []string{"cl"}
 	FlagClusterMembershipRole         = "role"
 	FlagIsGlobalNamespace             = "global-namespace"
-	FlagIsGlobalNamespaceAlias        = []string{"gd"}
+	FlagIsGlobalNamespaceAlias        = []string{"gn"}
 	FlagNamespaceData                 = "namespace-data"
 	FlagNamespaceDataAlias            = []string{"dmd"}
 	FlagPromoteNamespace              = "promote-namespace"
