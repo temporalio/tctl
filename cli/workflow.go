@@ -35,7 +35,7 @@ func newWorkflowCommands() []*cli.Command {
 	return []*cli.Command{
 		{
 			Name:  "start",
-			Usage: "Start a new workflow execution",
+			Usage: "Start a new workflow execution and return its workflowId and runID immediately",
 			Flags: append(flagsForStartWorkflow, flags.FlagsForPaginationAndRendering...),
 			Action: func(c *cli.Context) error {
 				return StartWorkflow(c, false)
