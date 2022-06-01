@@ -300,11 +300,11 @@ func (s *cliAppSuite) TestStartWorkflow_Failed() {
 	s.sdkClient.AssertExpectations(s.T())
 }
 
-func (s *cliAppSuite) TestRunWorkflow() {
+func (s *cliAppSuite) TestExecuteWorkflow() {
 	s.sdkClient.On("ExecuteWorkflow", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(workflowRun(), nil)
 	s.sdkClient.On("GetWorkflowHistory", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(historyEventIterator()).Once()
 
-	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "run", "--task-queue", "testTaskQueue", "--type", "testWorkflowType"})
+	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "execute", "--task-queue", "testTaskQueue", "--type", "testWorkflowType"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
 }

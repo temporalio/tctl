@@ -42,7 +42,7 @@ func newWorkflowCommands() []*cli.Command {
 			},
 		},
 		{
-			Name:  "run",
+			Name:  "execute",
 			Usage: "Start a new workflow execution and print progress",
 			Flags: append(flagsForStartWorkflow, flags.FlagsForPaginationAndRendering...),
 			Action: func(c *cli.Context) error {
