@@ -667,3 +667,11 @@ func defaultDataConverter() converter.DataConverter {
 func customDataConverter() converter.DataConverter {
 	return dataconverter.GetCurrent()
 }
+
+func allowedEnumValues(names map[int32]string) []string {
+	result := make([]string, len(names)-1)
+	for i := 0; i < len(result); i++ {
+		result[i] = names[int32(i+1)]
+	}
+	return result
+}

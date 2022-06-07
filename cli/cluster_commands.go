@@ -25,17 +25,23 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
-
-	"github.com/urfave/cli/v2"
-	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/temporalio/tctl-kit/pkg/color"
 	"github.com/temporalio/tctl-kit/pkg/output"
+	"github.com/urfave/cli/v2"
+	enumspb "go.temporal.io/api/enums/v1"
+	"go.temporal.io/api/operatorservice/v1"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 const (
-	fullWorkflowServiceName = "temporal.api.workflowservice.v1.WorkflowService"
+	fullWorkflowServiceName    = "temporal.api.workflowservice.v1.WorkflowService"
+	addSearchAttributesTimeout = 30 * time.Second
 )
 
 // HealthCheck check frontend health.
@@ -94,4 +100,118 @@ func ListSearchAttributes(c *cli.Context) error {
 	output.PrintItems(c, items, opts)
 
 	return nil
+}
+
+// AddSearchAttributes to add search attributes
+func AddSearchAttributes(c *cli.Context) error {
+	names := c.StringSlice(FlagName)
+	typeStrs := c.StringSlice(FlagType)
+
+	if len(names) != len(typeStrs) {
+		return fmt.Errorf("Number of names and types options should be the same.")
+	}
+
+	client := cFactory.OperatorClient(c)
+
+	ctx, cancel := newContext(c)
+	defer cancel()
+	listReq := &operatorservice.ListSearchAttributesRequest{}
+	existingSearchAttributes, err := client.ListSearchAttributes(ctx, listReq)
+	if err != nil {
+		return fmt.Errorf("Unable to get existing search attributes.: %s", err)
+	}
+
+	searchAttributes := make(map[string]enumspb.IndexedValueType, len(typeStrs))
+	for i := 0; i < len(typeStrs); i++ {
+		typeStr := typeStrs[i]
+
+		// To support backwards compatibility "String" is an alias to "Text".
+		// TODO: Remove this code in 1 year (after 10/15/22). @alexshtin
+		if strings.EqualFold(typeStr, "String") {
+			fmt.Println(color.Yellow(c, "Search attribute %s: String type is deprecated, use Text instead.", names[i]))
+			typeStr = "Text"
+		}
+
+		typeInt, err := stringToEnum(typeStr, enumspb.IndexedValueType_value)
+		if err != nil {
+			return fmt.Errorf("Unable to parse search attribute type %s: %s", typeStr, err)
+		}
+		existingSearchAttributeType, searchAttributeExists := existingSearchAttributes.CustomAttributes[names[i]]
+		if !searchAttributeExists {
+			searchAttributes[names[i]] = enumspb.IndexedValueType(typeInt)
+			continue
+		}
+		if existingSearchAttributeType != enumspb.IndexedValueType(typeInt) {
+			return fmt.Errorf("Search attribute %s already exists and has different type %s: %s", names[i], existingSearchAttributeType, err)
+		}
+	}
+
+	if len(searchAttributes) == 0 {
+		fmt.Println(color.Yellow(c, "Search attributes already exist"))
+		return nil
+	}
+
+	// ask user for confirmation
+	promptMsg := fmt.Sprintf(
+		"You are about to add search attributes %s. Continue? Y/N",
+		color.Yellow(c, strings.TrimLeft(fmt.Sprintf("%v", searchAttributes), "map")),
+	)
+	prompt(promptMsg, c.Bool(FlagYes))
+
+	request := &operatorservice.AddSearchAttributesRequest{
+		SearchAttributes: searchAttributes,
+	}
+
+	ctx, cancel = newContextWithTimeout(c, addSearchAttributesTimeout)
+	defer cancel()
+	_, err = client.AddSearchAttributes(ctx, request)
+	if err != nil {
+		return fmt.Errorf("unable to add search attributes.: %s", err)
+	}
+	fmt.Println(color.Green(c, "Search attributes have been added"))
+	return nil
+}
+
+// RemoveSearchAttributes to add search attributes
+func RemoveSearchAttributes(c *cli.Context) error {
+	names := c.StringSlice(FlagName)
+
+	promptMsg := fmt.Sprintf(
+		"You are about to remove search attributes %s. Continue? Y/N",
+		color.Yellow(c, "%v", names),
+	)
+	prompt(promptMsg, c.Bool(FlagYes))
+
+	client := cFactory.OperatorClient(c)
+	ctx, cancel := newContext(c)
+	defer cancel()
+	request := &operatorservice.RemoveSearchAttributesRequest{
+		SearchAttributes: names,
+	}
+
+	_, err := client.RemoveSearchAttributes(ctx, request)
+	if err != nil {
+		return fmt.Errorf("unable to remove search attributes.: %s", err)
+	}
+	fmt.Println(color.Green(c, "Search attributes have been removed"))
+	return nil
+}
+
+// prompt user to confirm/deny action
+func prompt(msg string, autoConfirm bool) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(msg, " ")
+	var text string
+	if autoConfirm {
+		text = "y"
+		fmt.Print("y")
+	} else {
+		text, _ = reader.ReadString('\n')
+	}
+	fmt.Println()
+
+	textLower := strings.ToLower(strings.TrimRight(text, "\n"))
+	if textLower != "y" && textLower != "yes" {
+		os.Exit(1)
+	}
 }
