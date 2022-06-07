@@ -25,9 +25,7 @@
 package cli
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -125,13 +123,6 @@ func AddSearchAttributes(c *cli.Context) error {
 	for i := 0; i < len(typeStrs); i++ {
 		typeStr := typeStrs[i]
 
-		// To support backwards compatibility "String" is an alias to "Text".
-		// TODO: Remove this code in 1 year (after 10/15/22). @alexshtin
-		if strings.EqualFold(typeStr, "String") {
-			fmt.Println(color.Yellow(c, "Search attribute %s: String type is deprecated, use Text instead.", names[i]))
-			typeStr = "Text"
-		}
-
 		typeInt, err := stringToEnum(typeStr, enumspb.IndexedValueType_value)
 		if err != nil {
 			return fmt.Errorf("Unable to parse search attribute type %s: %s", typeStr, err)
@@ -151,12 +142,13 @@ func AddSearchAttributes(c *cli.Context) error {
 		return nil
 	}
 
-	// ask user for confirmation
 	promptMsg := fmt.Sprintf(
 		"You are about to add search attributes %s. Continue? Y/N",
 		color.Yellow(c, strings.TrimLeft(fmt.Sprintf("%v", searchAttributes), "map")),
 	)
-	prompt(promptMsg, c.Bool(FlagYes))
+	if !prompt(promptMsg, c.Bool(FlagYes)) {
+		return nil
+	}
 
 	request := &operatorservice.AddSearchAttributesRequest{
 		SearchAttributes: searchAttributes,
@@ -180,7 +172,9 @@ func RemoveSearchAttributes(c *cli.Context) error {
 		"You are about to remove search attributes %s. Continue? Y/N",
 		color.Yellow(c, "%v", names),
 	)
-	prompt(promptMsg, c.Bool(FlagYes))
+	if !prompt(promptMsg, c.Bool(FlagYes)) {
+		return nil
+	}
 
 	client := cFactory.OperatorClient(c)
 	ctx, cancel := newContext(c)
@@ -195,23 +189,4 @@ func RemoveSearchAttributes(c *cli.Context) error {
 	}
 	fmt.Println(color.Green(c, "Search attributes have been removed"))
 	return nil
-}
-
-// prompt user to confirm/deny action
-func prompt(msg string, autoConfirm bool) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print(msg, " ")
-	var text string
-	if autoConfirm {
-		text = "y"
-		fmt.Print("y")
-	} else {
-		text, _ = reader.ReadString('\n')
-	}
-	fmt.Println()
-
-	textLower := strings.ToLower(strings.TrimRight(text, "\n"))
-	if textLower != "y" && textLower != "yes" {
-		os.Exit(1)
-	}
 }

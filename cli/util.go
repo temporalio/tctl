@@ -25,6 +25,7 @@
 package cli
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -674,4 +675,25 @@ func allowedEnumValues(names map[int32]string) []string {
 		result[i] = names[int32(i+1)]
 	}
 	return result
+}
+
+// prompt user to confirm/deny action
+func prompt(msg string, autoConfirm bool) bool {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(msg, " ")
+	var text string
+	if autoConfirm {
+		text = "y"
+		fmt.Print("y")
+	} else {
+		text, _ = reader.ReadString('\n')
+	}
+	fmt.Println()
+
+	textLower := strings.ToLower(strings.TrimRight(text, "\n"))
+	if textLower != "y" && textLower != "yes" {
+		return false
+	}
+
+	return true
 }
