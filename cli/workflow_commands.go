@@ -425,7 +425,7 @@ func DeleteWorkflow(c *cli.Context) error {
 		return fmt.Errorf("unable to delete workflow: %w", err)
 	}
 
-	fmt.Println("Delete workflow succeeded")
+	fmt.Println(color.Green(c, "Delete workflow succeeded"))
 
 	return nil
 }

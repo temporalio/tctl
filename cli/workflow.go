@@ -212,7 +212,7 @@ func newWorkflowCommands() []*cli.Command {
 		},
 		{
 			Name:  "reset-batch",
-			Usage: "Resets a batch of Workflow Executions by reset type: " + strings.Join(mapKeysToArray(resetTypesMap), ", "),
+			Usage: "Reset a batch of Workflow Executions by reset type: " + strings.Join(mapKeysToArray(resetTypesMap), ", "),
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:    FlagListQuery,
