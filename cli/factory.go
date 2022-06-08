@@ -38,10 +38,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/temporalio/tctl/cli/headersprovider"
-	"github.com/temporalio/tctl/cli/plugin"
+	"github.com/gogo/status"
 	"github.com/urfave/cli/v2"
 	"go.temporal.io/api/operatorservice/v1"
+	"go.temporal.io/api/serviceerror"
 	"go.temporal.io/api/workflowservice/v1"
 	sdkclient "go.temporal.io/sdk/client"
 	"google.golang.org/grpc"
@@ -49,6 +49,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/temporalio/tctl/cli/headersprovider"
+	"github.com/temporalio/tctl/cli/plugin"
 
 	"go.temporal.io/server/common/auth"
 	"go.temporal.io/server/common/log"
@@ -148,6 +151,14 @@ func headersProviderInterceptor(headersProvider plugin.HeadersProvider) grpc.Una
 	}
 }
 
+func errorInterceptor() grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		err := invoker(ctx, method, req, reply, cc, opts...)
+		err = serviceerror.FromStatus(status.Convert(err))
+		return err
+	}
+}
+
 func (b *clientFactory) createGRPCConnection(c *cli.Context) (*grpc.ClientConn, error) {
 	hostPort := readFlagOrConfig(c, FlagAddress)
 	if hostPort == "" {
@@ -165,12 +176,17 @@ func (b *clientFactory) createGRPCConnection(c *cli.Context) (*grpc.ClientConn, 
 		grpcSecurityOptions = grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig))
 	}
 
-	dialOpts := []grpc.DialOption{
-		grpcSecurityOptions,
+	interceptors := []grpc.UnaryClientInterceptor{
+		errorInterceptor(),
 	}
 	headersProvider := headersprovider.GetCurrent()
 	if headersProvider != nil {
-		dialOpts = append(dialOpts, grpc.WithUnaryInterceptor(headersProviderInterceptor(headersProvider)))
+		interceptors = append(interceptors, headersProviderInterceptor(headersProvider))
+	}
+
+	dialOpts := []grpc.DialOption{
+		grpcSecurityOptions,
+		grpc.WithChainUnaryInterceptor(interceptors...),
 	}
 
 	connection, err := grpc.Dial(hostPort, dialOpts...)
