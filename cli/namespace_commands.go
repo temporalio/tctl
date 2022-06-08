@@ -360,7 +360,6 @@ func DeleteNamespace(c *cli.Context) error {
 	}
 
 	client := cFactory.OperatorClient(c)
-	c.Args()
 	ctx, cancel := newContext(c)
 	defer cancel()
 	_, err := client.DeleteNamespace(ctx, &operatorservice.DeleteNamespaceRequest{
@@ -376,7 +375,7 @@ func DeleteNamespace(c *cli.Context) error {
 		}
 	}
 
-	fmt.Println(color.Green(c, "Namespace %s successfully deleted", nsName))
+	fmt.Println(color.Green(c, "Namespace %s has been deleted", nsName))
 	return nil
 }
 

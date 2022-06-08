@@ -44,6 +44,9 @@ import (
 	"go.temporal.io/api/serviceerror"
 	"go.temporal.io/api/workflowservice/v1"
 	sdkclient "go.temporal.io/sdk/client"
+	"go.temporal.io/server/common/auth"
+	"go.temporal.io/server/common/log"
+	"go.temporal.io/server/common/log/tag"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -52,10 +55,6 @@ import (
 
 	"github.com/temporalio/tctl/cli/headersprovider"
 	"github.com/temporalio/tctl/cli/plugin"
-
-	"go.temporal.io/server/common/auth"
-	"go.temporal.io/server/common/log"
-	"go.temporal.io/server/common/log/tag"
 )
 
 var netClient HttpGetter = &http.Client{
