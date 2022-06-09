@@ -264,7 +264,7 @@ func CreateSchedule(c *cli.Context) error {
 
 	_, err = frontendClient.CreateSchedule(ctx, req)
 	if err != nil {
-		return fmt.Errorf("failed to create schedule.\n%s", err)
+		return fmt.Errorf("unable to create schedule: %s", err)
 	}
 
 	fmt.Println(color.Green(c, "Schedule created"))

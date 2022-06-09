@@ -233,11 +233,9 @@ var (
 	FlagScheduleID                    = "schedule-id"
 	FlagScheduleIDAlias               = []string{"sid"}
 	FlagOverlapPolicy                 = "overlap-policy"
-	FlagOverlapPolicyAlias            = []string{"op"}
 	FlagCalendar                      = "calendar"
 	FlagCalendarAlias                 = []string{"cal"}
 	FlagInterval                      = "interval"
-	FlagIntervalAlias                 = []string{"int"}
 	FlagStartTime                     = "start-time"
 	FlagEndTime                       = "end-time"
 	FlagJitter                        = "jitter"
@@ -249,9 +247,7 @@ var (
 	FlagCatchupWindow                 = "catchup-window"
 	FlagPauseOnFailure                = "pause-on-failure"
 	FlagPause                         = "pause"
-	FlagPauseAlias                    = []string{"p"}
 	FlagUnpause                       = "unpause"
-	FlagUnpauseAlias                  = []string{"u"}
 
 	FlagProtoType  = "type"
 	FlagHexData    = "hex-data"

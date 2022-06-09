@@ -31,7 +31,7 @@ var tctlCommands = []*cli.Command{
 	},
 	{
 		Name:        "schedule",
-		Aliases:     []string{"sch"},
+		Aliases:     []string{"s"},
 		Usage:       "Operations on schedules",
 		Subcommands: newScheduleCommands(),
 	},

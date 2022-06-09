@@ -35,13 +35,12 @@ func newScheduleCommands() []*cli.Command {
 	sid := &cli.StringFlag{
 		Name:     FlagScheduleID,
 		Aliases:  FlagScheduleIDAlias,
-		Usage:    "Schedule id",
+		Usage:    "Schedule Id",
 		Required: true,
 	}
 	overlap := &cli.StringFlag{
-		Name:    FlagOverlapPolicy,
-		Aliases: FlagOverlapPolicyAlias,
-		Usage:   "Overlap policy: Skip, BufferOne, BufferAll, CancelOther, TerminateOther, AllowAll",
+		Name:  FlagOverlapPolicy,
+		Usage: "Overlap policy: Skip, BufferOne, BufferAll, CancelOther, TerminateOther, AllowAll",
 	}
 
 	scheduleSpecFlags := []cli.Flag{
@@ -51,9 +50,8 @@ func newScheduleCommands() []*cli.Command {
 			Usage:   `Calendar specification in JSON, e.g. {"dayOfWeek":"Fri","hour":"17","minute":"5"}`,
 		},
 		&cli.StringSliceFlag{
-			Name:    FlagInterval,
-			Aliases: FlagIntervalAlias,
-			Usage:   "Interval duration, e.g. 90m, or 90m/13m to include phase offset",
+			Name:  FlagInterval,
+			Usage: "Interval duration, e.g. 90m, or 90m/13m to include phase offset",
 		},
 		&cli.StringFlag{
 			Name:  FlagStartTime,
@@ -147,7 +145,6 @@ func newScheduleCommands() []*cli.Command {
 		},
 		{
 			Name:        "update",
-			Aliases:     []string{"up"},
 			Usage:       "Updates a schedule with a new definition (full replacement, not patch)",
 			Description: "Takes a schedule specification plus all the same args as starting a workflow",
 			Flags:       createFlags,
@@ -159,14 +156,12 @@ func newScheduleCommands() []*cli.Command {
 			Flags: []cli.Flag{
 				sid,
 				&cli.BoolFlag{
-					Name:    FlagPause,
-					Aliases: FlagPauseAlias,
-					Usage:   "Pauses the schedule",
+					Name:  FlagPause,
+					Usage: "Pauses the schedule",
 				},
 				&cli.BoolFlag{
-					Name:    FlagUnpause,
-					Aliases: FlagUnpauseAlias,
-					Usage:   "Unpauses the schedule",
+					Name:  FlagUnpause,
+					Usage: "Unpauses the schedule",
 				},
 				&cli.StringFlag{
 					Name:    FlagReason,
@@ -219,9 +214,8 @@ func newScheduleCommands() []*cli.Command {
 			Action: DescribeSchedule,
 		},
 		{
-			Name:    "delete",
-			Aliases: []string{"rm"},
-			Usage:   "Deletes a schedule",
+			Name:  "delete",
+			Usage: "Deletes a schedule",
 			Flags: []cli.Flag{
 				sid,
 			},
@@ -229,7 +223,7 @@ func newScheduleCommands() []*cli.Command {
 		},
 		{
 			Name:    "list",
-			Aliases: []string{"ls"},
+			Aliases: []string{"l"},
 			Usage:   "Lists schedules",
 			Flags:   append([]cli.Flag{}, flags.FlagsForPaginationAndRendering...),
 			Action:  ListSchedules,
