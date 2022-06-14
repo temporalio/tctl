@@ -302,7 +302,7 @@ func (d *namespaceCLIImpl) UpdateNamespace(c *cli.Context) {
 	}
 }
 
-// DescribeNamespace updates a namespace
+// DescribeNamespace describes a namespace
 func (d *namespaceCLIImpl) DescribeNamespace(c *cli.Context) {
 	namespace := c.GlobalString(FlagNamespace)
 	namespaceID := c.String(FlagNamespaceID)
@@ -337,33 +337,46 @@ func (d *namespaceCLIImpl) DescribeNamespace(c *cli.Context) {
 }
 
 func printNamespace(resp *workflowservice.DescribeNamespaceResponse) {
-	var formatStr = "Name: %v\nId: %v\nDescription: %v\nOwnerEmail: %v\nNamespaceData: %#v\nState: %v\nRetention: %v\n" +
-		"ActiveClusterName: %v\nClusters: %v\nHistoryArchivalState: %v\nIsGlobalNamespace: %v\n"
-	descValues := []interface{}{
-		resp.NamespaceInfo.GetName(),
-		resp.NamespaceInfo.GetId(),
-		resp.NamespaceInfo.GetDescription(),
-		resp.NamespaceInfo.GetOwnerEmail(),
-		resp.NamespaceInfo.Data,
-		resp.NamespaceInfo.GetState(),
-		timestamp.DurationValue(resp.Config.GetWorkflowExecutionRetentionTtl()),
-		resp.ReplicationConfig.GetActiveClusterName(),
-		clustersToString(resp.ReplicationConfig.Clusters),
-		resp.Config.GetHistoryArchivalState().String(),
-		resp.GetIsGlobalNamespace(),
+	type formatVal struct {
+		format string
+		val    interface{}
 	}
-	if resp.Config.GetHistoryArchivalUri() != "" {
-		formatStr = formatStr + "HistoryArchivalURI: %v\n"
-		descValues = append(descValues, resp.Config.GetHistoryArchivalUri())
+
+	var formatVals []formatVal
+	if resp.NamespaceInfo != nil {
+		formatVals = append(formatVals, []formatVal{
+			{"Name: %v", resp.NamespaceInfo.GetName()},
+			{"Id: %v", resp.NamespaceInfo.GetId()},
+			{"Description: %v", resp.NamespaceInfo.GetDescription()},
+			{"OwnerEmail: %v", resp.NamespaceInfo.GetOwnerEmail()},
+			{"NamespaceData: %#v", resp.NamespaceInfo.Data},
+			{"State: %v", resp.NamespaceInfo.GetState()},
+		}...)
 	}
-	formatStr = formatStr + "VisibilityArchivalState: %v\n"
-	descValues = append(descValues, resp.Config.GetVisibilityArchivalState().String())
-	if resp.Config.GetVisibilityArchivalUri() != "" {
-		formatStr = formatStr + "VisibilityArchivalURI: %v\n"
-		descValues = append(descValues, resp.Config.GetVisibilityArchivalUri())
+	if resp.Config != nil {
+		formatVals = append(formatVals, formatVal{"Retention: %v", timestamp.DurationValue(resp.Config.GetWorkflowExecutionRetentionTtl())})
 	}
-	fmt.Printf(formatStr, descValues...)
-	if resp.Config.BadBinaries != nil {
+	if resp.ReplicationConfig != nil {
+		formatVals = append(formatVals, formatVal{"ActiveClusterName: %v", resp.ReplicationConfig.GetActiveClusterName()})
+		formatVals = append(formatVals, formatVal{"Clusters: %v", clustersToString(resp.ReplicationConfig.Clusters)})
+	}
+	if resp.Config != nil {
+		formatVals = append(formatVals, formatVal{"HistoryArchivalState: %v", resp.Config.GetHistoryArchivalState().String()})
+	}
+	formatVals = append(formatVals, formatVal{"IsGlobalNamespace: %v", resp.GetIsGlobalNamespace()})
+	if resp.Config != nil {
+		if resp.Config.GetHistoryArchivalUri() != "" {
+			formatVals = append(formatVals, formatVal{"HistoryArchivalURI: %v", resp.Config.GetHistoryArchivalUri()})
+		}
+		formatVals = append(formatVals, formatVal{"VisibilityArchivalState: %v", resp.Config.GetVisibilityArchivalState().String()})
+		if resp.Config.GetVisibilityArchivalUri() != "" {
+			formatVals = append(formatVals, formatVal{"VisibilityArchivalURI: %v", resp.Config.GetVisibilityArchivalUri()})
+		}
+	}
+	for _, p := range formatVals {
+		fmt.Printf(p.format+"\n", p.val)
+	}
+	if resp.Config != nil && resp.Config.BadBinaries != nil {
 		fmt.Println("Bad binaries to reset:")
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetBorder(true)
