@@ -342,41 +342,38 @@ func printNamespace(resp *workflowservice.DescribeNamespaceResponse) {
 		val    interface{}
 	}
 
-	var formatVals []formatVal
-	if resp.NamespaceInfo != nil {
-		formatVals = append(formatVals, []formatVal{
-			{"Name: %v", resp.NamespaceInfo.GetName()},
-			{"Id: %v", resp.NamespaceInfo.GetId()},
-			{"Description: %v", resp.NamespaceInfo.GetDescription()},
-			{"OwnerEmail: %v", resp.NamespaceInfo.GetOwnerEmail()},
-			{"NamespaceData: %#v", resp.NamespaceInfo.Data},
-			{"State: %v", resp.NamespaceInfo.GetState()},
-		}...)
+	formatVals := []formatVal{
+		{"Name: %v", resp.GetNamespaceInfo().GetName()},
+		{"Id: %v", resp.GetNamespaceInfo().GetId()},
+		{"Description: %v", resp.GetNamespaceInfo().GetDescription()},
+		{"OwnerEmail: %v", resp.GetNamespaceInfo().GetOwnerEmail()},
+		{"NamespaceData: %#v", resp.GetNamespaceInfo().Data},
+		{"State: %v", resp.GetNamespaceInfo().GetState()},
 	}
-	if resp.Config != nil {
+	if resp.GetConfig() != nil {
 		formatVals = append(formatVals, formatVal{"Retention: %v", timestamp.DurationValue(resp.Config.GetWorkflowExecutionRetentionTtl())})
 	}
-	if resp.ReplicationConfig != nil {
+	if resp.GetReplicationConfig() != nil {
 		formatVals = append(formatVals, formatVal{"ActiveClusterName: %v", resp.ReplicationConfig.GetActiveClusterName()})
 		formatVals = append(formatVals, formatVal{"Clusters: %v", clustersToString(resp.ReplicationConfig.Clusters)})
 	}
-	if resp.Config != nil {
+	if resp.GetConfig() != nil {
 		formatVals = append(formatVals, formatVal{"HistoryArchivalState: %v", resp.Config.GetHistoryArchivalState().String()})
 	}
 	formatVals = append(formatVals, formatVal{"IsGlobalNamespace: %v", resp.GetIsGlobalNamespace()})
-	if resp.Config != nil {
-		if resp.Config.GetHistoryArchivalUri() != "" {
-			formatVals = append(formatVals, formatVal{"HistoryArchivalURI: %v", resp.Config.GetHistoryArchivalUri()})
-		}
+	if resp.GetConfig().GetHistoryArchivalUri() != "" {
+		formatVals = append(formatVals, formatVal{"HistoryArchivalURI: %v", resp.Config.GetHistoryArchivalUri()})
+	}
+	if resp.GetConfig() != nil {
 		formatVals = append(formatVals, formatVal{"VisibilityArchivalState: %v", resp.Config.GetVisibilityArchivalState().String()})
-		if resp.Config.GetVisibilityArchivalUri() != "" {
-			formatVals = append(formatVals, formatVal{"VisibilityArchivalURI: %v", resp.Config.GetVisibilityArchivalUri()})
-		}
+	}
+	if resp.GetConfig().GetVisibilityArchivalUri() != "" {
+		formatVals = append(formatVals, formatVal{"VisibilityArchivalURI: %v", resp.Config.GetVisibilityArchivalUri()})
 	}
 	for _, p := range formatVals {
 		fmt.Printf(p.format+"\n", p.val)
 	}
-	if resp.Config != nil && resp.Config.BadBinaries != nil {
+	if resp.GetConfig().GetBadBinaries() != nil {
 		fmt.Println("Bad binaries to reset:")
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetBorder(true)
