@@ -215,6 +215,7 @@ var (
 	FlagTLSServerName                 = "tls-server-name"
 	FlagLastMessageID                 = "last-message-id"
 	FlagConcurrency                   = "concurrency"
+	FlagConcurrencyAlias              = []string{"c"}
 	FlagReportRate                    = "report-rate"
 	FlagLowerShardBound               = "lower-shard-bound"
 	FlagUpperShardBound               = "upper-shard-bound"
@@ -248,6 +249,9 @@ var (
 	FlagPauseOnFailure                = "pause-on-failure"
 	FlagPause                         = "pause"
 	FlagUnpause                       = "unpause"
+	FlagShowAll                       = "all"
+	FlagChildsDepth                   = "depth"
+	FlagChildsDepthAlias              = []string{"d"}
 
 	FlagProtoType  = "type"
 	FlagHexData    = "hex-data"
@@ -442,3 +446,23 @@ var flagsForStackTraceQuery = append(flagsForExecution, []cli.Flag{
 		Usage:   "Optional flag to reject queries based on Workflow state. Valid values are \"not_open\" and \"not_completed_cleanly\"",
 	},
 }...)
+
+var flagsForTraceWorkflow = []cli.Flag{
+	&cli.IntFlag{
+		Name:    FlagChildsDepth,
+		Aliases: FlagChildsDepthAlias,
+		Value:   -1,
+		Usage:   "Number of child workflows to expand, -1 to expand all child workflows",
+	},
+	&cli.IntFlag{
+		Name:    FlagConcurrency,
+		Aliases: FlagConcurrencyAlias,
+		Value:   10,
+		Usage:   "Request concurrency",
+	},
+	&cli.BoolFlag{
+		Name:  FlagShowAll,
+		Value: false,
+		Usage: "Display all child workflows within the specified depth",
+	},
+}
