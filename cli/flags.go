@@ -250,8 +250,8 @@ var (
 	FlagPause                         = "pause"
 	FlagUnpause                       = "unpause"
 	FlagShowAll                       = "all"
-	FlagChildsDepth                   = "depth"
-	FlagChildsDepthAlias              = []string{"d"}
+	FlagDepth                         = "depth"
+	FlagDepthAlias                    = []string{"d"}
 
 	FlagProtoType  = "type"
 	FlagHexData    = "hex-data"
@@ -449,8 +449,8 @@ var flagsForStackTraceQuery = append(flagsForExecution, []cli.Flag{
 
 var flagsForTraceWorkflow = []cli.Flag{
 	&cli.IntFlag{
-		Name:    FlagChildsDepth,
-		Aliases: FlagChildsDepthAlias,
+		Name:    FlagDepth,
+		Aliases: FlagDepthAlias,
 		Value:   -1,
 		Usage:   "Number of child workflows to expand, -1 to expand all child workflows",
 	},
@@ -463,6 +463,7 @@ var flagsForTraceWorkflow = []cli.Flag{
 	&cli.BoolFlag{
 		Name:  FlagShowAll,
 		Value: false,
-		Usage: "Display all child workflows within the specified depth",
+		Usage: "Shows all the child workflows rather than folding closed executions. " +
+			"This will fetch more history events, so it will impact performance for big workflows",
 	},
 }
