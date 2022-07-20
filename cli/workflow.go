@@ -277,10 +277,11 @@ func newWorkflowCommands() []*cli.Command {
 			},
 		},
 		{
-			Name:   "trace",
-			Usage:  "Traces a workflow's execution with progress of its child workflows and activities",
-			Flags:  append(flagsForExecution, flagsForTraceWorkflow...),
-			Action: TraceWorkflow,
+			Name:    "trace",
+			Aliases: []string{"t"},
+			Usage:   "Traces a workflow's execution with progress of its child workflows and activities",
+			Flags:   append(flagsForExecution, flagsForTraceWorkflow...),
+			Action:  TraceWorkflow,
 		},
 	}
 }

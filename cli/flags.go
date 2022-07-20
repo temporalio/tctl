@@ -250,6 +250,8 @@ var (
 	FlagPause                         = "pause"
 	FlagUnpause                       = "unpause"
 	FlagShowAll                       = "all"
+	FlagFold                          = "fold"
+	FlagNoFold                        = "no-fold"
 	FlagDepth                         = "depth"
 	FlagDepthAlias                    = []string{"d"}
 
@@ -460,10 +462,13 @@ var flagsForTraceWorkflow = []cli.Flag{
 		Value:   10,
 		Usage:   "Request concurrency",
 	},
+	&cli.StringFlag{
+		Name:  FlagFold,
+		Usage: "Workflow statuses to fold, comma separated.",
+		Value: "Completed,Canceled,Terminated",
+	},
 	&cli.BoolFlag{
-		Name:  FlagShowAll,
-		Value: false,
-		Usage: "Shows all the child workflows rather than folding closed executions. " +
-			"This will fetch more history events, so it will impact performance for big workflows",
+		Name:  FlagNoFold,
+		Usage: "Disable folding. All child workflows within the set depth will be fetched and displayed",
 	},
 }

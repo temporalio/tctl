@@ -761,3 +761,24 @@ func ensureNonNil[T any, P ~*T](ptr *P) {
 		*ptr = new(T)
 	}
 }
+
+func listWorkflowExecutionStatusNames() string {
+	var names []string
+	for _, name := range enumspb.WorkflowExecutionStatus_name {
+		names = append(names, name)
+	}
+	return strings.Join(names, ", ")
+}
+
+func parseFoldStatusList(flagValue string) ([]enumspb.WorkflowExecutionStatus, error) {
+	var statusList []enumspb.WorkflowExecutionStatus
+	for _, value := range strings.Split(flagValue, ",") {
+		if status, ok := enumspb.WorkflowExecutionStatus_value[value]; ok {
+			statusList = append(statusList, enumspb.WorkflowExecutionStatus(status))
+		} else {
+			return nil,
+				fmt.Errorf("invalid status \"%s\" for fold flag. Valid values: %s", value, listWorkflowExecutionStatusNames())
+		}
+	}
+	return statusList, nil
+}
