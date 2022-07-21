@@ -25,6 +25,7 @@
 package cli
 
 import (
+	"fmt"
 	"github.com/temporalio/tctl-kit/pkg/output"
 	"github.com/urfave/cli/v2"
 )
@@ -249,7 +250,6 @@ var (
 	FlagPauseOnFailure                = "pause-on-failure"
 	FlagPause                         = "pause"
 	FlagUnpause                       = "unpause"
-	FlagShowAll                       = "all"
 	FlagFold                          = "fold"
 	FlagNoFold                        = "no-fold"
 	FlagDepth                         = "depth"
@@ -464,8 +464,8 @@ var flagsForTraceWorkflow = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Name:  FlagFold,
-		Usage: "Workflow statuses to fold, comma separated.",
-		Value: "Completed,Canceled,Terminated",
+		Usage: fmt.Sprintf("Statuses for which child workflows will be folded in (this will reduce the number of information fetched and displayed). Case-insensitive and ignored if --%s supplied", FlagNoFold),
+		Value: "completed,canceled,terminated",
 	},
 	&cli.BoolFlag{
 		Name:  FlagNoFold,

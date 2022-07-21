@@ -98,7 +98,7 @@ func (s *utilSuite) TestParseFoldStatusList() {
 		wantErr bool
 	}{
 		"default values": {
-			value: "Completed,Canceled,Terminated",
+			value: "completed,canceled,terminated",
 			want: []enumspb.WorkflowExecutionStatus{
 				enumspb.WORKFLOW_EXECUTION_STATUS_COMPLETED,
 				enumspb.WORKFLOW_EXECUTION_STATUS_CANCELED,
@@ -113,8 +113,20 @@ func (s *utilSuite) TestParseFoldStatusList() {
 			value:   "Foobar",
 			wantErr: true,
 		},
-		"all values": {
+		"title case": {
 			value: "Running,Completed,Failed,Canceled,Terminated,ContinuedAsNew,TimedOut",
+			want: []enumspb.WorkflowExecutionStatus{
+				enumspb.WORKFLOW_EXECUTION_STATUS_RUNNING,
+				enumspb.WORKFLOW_EXECUTION_STATUS_COMPLETED,
+				enumspb.WORKFLOW_EXECUTION_STATUS_FAILED,
+				enumspb.WORKFLOW_EXECUTION_STATUS_CANCELED,
+				enumspb.WORKFLOW_EXECUTION_STATUS_TERMINATED,
+				enumspb.WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW,
+				enumspb.WORKFLOW_EXECUTION_STATUS_TIMED_OUT,
+			},
+		},
+		"upper case": {
+			value: "RUNNING,COMPLETED,FAILED,CANCELED,TERMINATED,CONTINUEDASNEW,TIMEDOUT",
 			want: []enumspb.WorkflowExecutionStatus{
 				enumspb.WORKFLOW_EXECUTION_STATUS_RUNNING,
 				enumspb.WORKFLOW_EXECUTION_STATUS_COMPLETED,

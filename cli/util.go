@@ -765,16 +765,28 @@ func ensureNonNil[T any, P ~*T](ptr *P) {
 func listWorkflowExecutionStatusNames() string {
 	var names []string
 	for _, name := range enumspb.WorkflowExecutionStatus_name {
-		names = append(names, name)
+		names = append(names, strings.ToLower(name))
 	}
 	return strings.Join(names, ", ")
+}
+
+// findWorkflowStatusValue finds a WorkflowExecutionStatus by its name. This search is case-insensitive.
+func findWorkflowStatusValue(name string) (enumspb.WorkflowExecutionStatus, bool) {
+	lowerName := strings.ToLower(name)
+	for key, value := range enumspb.WorkflowExecutionStatus_value {
+		if lowerName == strings.ToLower(key) {
+			return enumspb.WorkflowExecutionStatus(value), true
+		}
+	}
+
+	return 0, false
 }
 
 func parseFoldStatusList(flagValue string) ([]enumspb.WorkflowExecutionStatus, error) {
 	var statusList []enumspb.WorkflowExecutionStatus
 	for _, value := range strings.Split(flagValue, ",") {
-		if status, ok := enumspb.WorkflowExecutionStatus_value[value]; ok {
-			statusList = append(statusList, enumspb.WorkflowExecutionStatus(status))
+		if status, ok := findWorkflowStatusValue(value); ok {
+			statusList = append(statusList, status)
 		} else {
 			return nil,
 				fmt.Errorf("invalid status \"%s\" for fold flag. Valid values: %s", value, listWorkflowExecutionStatusNames())
