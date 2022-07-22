@@ -2,13 +2,12 @@ package sundial
 
 import (
 	"fmt"
-	"strconv"
-	"time"
-
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/failure/v1"
 	"go.temporal.io/api/history/v1"
+	"strconv"
+	"time"
 )
 
 // ExecutionState provides a common interface to any execution (Workflows, Activities and Timers in this case) updated through HistoryEvents.
@@ -23,41 +22,57 @@ type ExecutionState interface {
 	GetStartTime() *time.Time
 }
 
-// WorkflowExecutionState is a snapshot of the state of a WorkflowExecution.
+// WorkflowExecutionState is a snapshot of the state of a WorkflowExecution. It is updated through HistoryEvents.
 type WorkflowExecutionState struct {
-	Execution     *common.WorkflowExecution
-	Type          *common.WorkflowType
-	StartTime     *time.Time
-	CloseTime     *time.Time
-	Status        enums.WorkflowExecutionStatus
-	LastEventId   int64
-	HistoryLength int64
-	IsArchived    bool
+	// Execution is the workflow's execution (WorkflowId and RunId).
+	Execution *common.WorkflowExecution
+	// Type is the name/type of Workflow.
+	Type *common.WorkflowType
+	// StartTime is the time the Execution was started (based on the first Execution's Event).
+	StartTime *time.Time
+	// CloseTime is the time the Execution was closed (based on the first Execution's Event). Will be nil if the Execution hasn't been closed yet.
+	CloseTime *time.Time
+	// Status is the Execution's Status based on the last event that was processed.
+	Status enums.WorkflowExecutionStatus
+	// IsArchived will be true if the workflow has been archived.
+	IsArchived bool
 
-	// ChildStates contains all the executions contained by this WorkflowExecutionState in order of execution.
+	// LastEventId is the EventId of the last processed HistoryEvent.
+	LastEventId int64
+	// HistoryLength is the number of HistoryEvents available in the server. It will zero for archived workflows and non-zero positive for any other workflow executions.
+	HistoryLength int64
+
+	// ChildStates contains all the ExecutionStates contained by this WorkflowExecutionState in order of execution.
 	ChildStates []ExecutionState
-	// activityMap contains all the activities executed in the Workflow, indexed by the EVENT_TYPE_ACTIVITY_TASK_SCHEDULED event id
-	// Used to retrieve the activities from events
+	// activityMap contains all the activities executed in the Workflow, indexed by the EVENT_TYPE_ACTIVITY_TASK_SCHEDULED event id.
+	// Used to retrieve the activities from events.
 	activityMap map[int64]*ActivityExecutionState
-	// childWfMap contains all the child workflows executed in the Workflow, indexed by the EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED event id
-	// Used to retrieve the child workflows from events
+	// childWfMap contains all the child workflows executed in the Workflow, indexed by the EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED event id.
+	// Used to retrieve the child workflows from events.
 	childWfMap map[int64]*WorkflowExecutionState
-	// timerMap contains all the timers executed in the Workflow, indexed by the EVENT_TYPE_TIMER_STARTED event id
-	// Used to retrieve the timers from events
+	// timerMap contains all the timers executed in the Workflow, indexed by the EVENT_TYPE_TIMER_STARTED event id.
+	// Used to retrieve the timers from events.
 	timerMap map[int64]*TimerExecutionState
 
 	// Non-successful closed states
-	Failure       *failure.Failure
-	Termination   *history.WorkflowExecutionTerminatedEventAttributes
+	// Failure contains the last failure that the Execution has reported (if any).
+	Failure *failure.Failure
+	// Termination contains the last available termination information that the Workflow Execution has reported (if any).
+	Termination *history.WorkflowExecutionTerminatedEventAttributes
+	// CancelRequest contains the last request that has been made to cancel the Workflow Execution (if any).
 	CancelRequest *history.WorkflowExecutionCancelRequestedEventAttributes
-	RetryState    enums.RetryState
+	// RetryState contains the reason provided for whether the Task should or shouldn't be retried.
+	RetryState enums.RetryState
 
 	// Timeout and retry policies
+	// WorkflowExecutionTimeout contains the Workflow Execution's timeout if it has been set.
 	WorkflowExecutionTimeout *time.Duration
-	Attempt                  int32
-	MaximumAttempts          int32
+	// Attempt contains the current Workflow Execution's attempt.
+	Attempt int32
+	// MaximumAttempts contains the maximum number of times the Workflow Execution is allowed to retry before failing.
+	MaximumAttempts int32
 
-	// Parent Information
+	// ParentWorkflowExecution identifies the parent Workflow and the execution run.
 	ParentWorkflowExecution *common.WorkflowExecution
 }
 
@@ -91,6 +106,7 @@ func (state *WorkflowExecutionState) GetDuration() *time.Duration {
 	return getDuration(state.StartTime, state.CloseTime)
 }
 
+// newActivity adds a new ActivityExecutionState to the WorkflowExecutionState's ChildStates.
 func (state *WorkflowExecutionState) newActivity(event *history.HistoryEvent) *ActivityExecutionState {
 	if state.activityMap == nil {
 		state.activityMap = make(map[int64]*ActivityExecutionState)
@@ -104,6 +120,7 @@ func (state *WorkflowExecutionState) newActivity(event *history.HistoryEvent) *A
 	return activityState
 }
 
+// updateActivity updates a child ActivityExecutionState with a HistoryEvent by its scheduleId
 func (state *WorkflowExecutionState) updateActivity(scheduledId int64, event *history.HistoryEvent) {
 	if activityState, ok := state.activityMap[scheduledId]; ok {
 		activityState.Update(event)
@@ -120,6 +137,7 @@ func (state *WorkflowExecutionState) FindChildWorkflow(execution *common.Workflo
 	return nil
 }
 
+// newChildWorkflow adds a new WorkflowExecutionState to the WorkflowExecutionState's ChildStates.
 func (state *WorkflowExecutionState) newChildWorkflow(event *history.HistoryEvent) *WorkflowExecutionState {
 	if state.childWfMap == nil {
 		state.childWfMap = make(map[int64]*WorkflowExecutionState)
@@ -134,6 +152,7 @@ func (state *WorkflowExecutionState) newChildWorkflow(event *history.HistoryEven
 	return childWfState
 }
 
+// newTimer adds a new TimerExecutionState to the WorkflowExecutionState's ChildStates.
 func (state *WorkflowExecutionState) newTimer(event *history.HistoryEvent) *TimerExecutionState {
 	if state.timerMap == nil {
 		state.timerMap = make(map[int64]*TimerExecutionState)
@@ -147,6 +166,7 @@ func (state *WorkflowExecutionState) newTimer(event *history.HistoryEvent) *Time
 	return timerState
 }
 
+// updateTimer updates a child TimerExecutionState with a HistoryEvent by its startedId
 func (state *WorkflowExecutionState) updateTimer(startedId int64, event *history.HistoryEvent) {
 	if timerState, ok := state.timerMap[startedId]; ok {
 		timerState.Update(event)
@@ -162,6 +182,7 @@ func (state *WorkflowExecutionState) IsCompleted() bool {
 		state.Status == enums.WORKFLOW_EXECUTION_STATUS_TERMINATED
 }
 
+// Update updates the WorkflowExecutionState and its child states with a HistoryEvent.
 func (state *WorkflowExecutionState) Update(event *history.HistoryEvent) {
 	if event == nil {
 		return
@@ -352,20 +373,33 @@ var (
 	ACTIVITY_EXECUTION_STATUS_CANCELED         ActivityExecutionStatus = 7
 )
 
+// ActivityExecutionState is a snapshot of the state of an Activity's Execution.
+// It implements the ExecutionState interface so it can be referenced as a WorkflowExecutionState's child state.
 type ActivityExecutionState struct {
+	// ActivityId is the Activity's id, which will usually be the EventId of the Event it was scheduled with.
 	ActivityId string
-	Status     ActivityExecutionStatus
-	Type       *common.ActivityType
-	Attempt    int32
-	Failure    *failure.Failure
+	// Status is the Execution's Status based on the last event that was processed.
+	Status ActivityExecutionStatus
+	// Type is the name/type of Activity.
+	Type *common.ActivityType
+	// Attempt contains the current Activity Execution's attempt.
+	// Since Activities' events aren't reported until the Activity is closed, this will always be the last attempt.
+	Attempt int32
+	// Failure contains the last failure that the Execution has reported (if any).
+	Failure *failure.Failure
+	// RetryState contains the reason provided for whether the Task should or shouldn't be retried.
 	RetryState enums.RetryState
 
+	// StartTime is the time the Execution was started (based on the start Event).
 	StartTime *time.Time
+	// CloseTime is the time the Execution was closed (based on the closing Event). Will be nil if the Execution hasn't been closed yet.
 	CloseTime *time.Time
 }
 
 func NewActivityExecutionState() *ActivityExecutionState {
-	return &ActivityExecutionState{}
+	return &ActivityExecutionState{
+		Status: ACTIVITY_EXECUTION_STATUS_UNSPECIFIED,
+	}
 }
 
 func (state *ActivityExecutionState) GetName() string {
@@ -392,6 +426,7 @@ func (state *ActivityExecutionState) GetDuration() *time.Duration {
 	return getDuration(state.StartTime, state.CloseTime)
 }
 
+// Update updates the ActivityExecutionState with a HistoryEvent.
 func (state *ActivityExecutionState) Update(event *history.HistoryEvent) {
 	switch event.EventType {
 	case enums.EVENT_TYPE_ACTIVITY_TASK_SCHEDULED:
@@ -443,13 +478,19 @@ func (state *ActivityExecutionState) Update(event *history.HistoryEvent) {
 }
 
 // TimerExecutionState contains information about a Timer as an execution.
+// It implements the ExecutionState interface so it can be referenced as a WorkflowExecutionState's child state.
 type TimerExecutionState struct {
-	TimerId            string
-	Name               string
+	TimerId string
+	// Name is the name of the Timer (if any has been given to it)
+	Name string
+	// StartToFireTimeout is the amount of time to elapse before the timer fires.
 	StartToFireTimeout *time.Duration
-	Status             TimerExecutionStatus
-	StartTime          *time.Time
-	CloseTime          *time.Time
+	// Status is the Execution's Status based on the last event that was processed.
+	Status TimerExecutionStatus
+	// StartTime is the time the Execution was started (based on the start Event).
+	StartTime *time.Time
+	// CloseTime is the time the Execution was closed (based on the closing Event). Will be nil if the Execution hasn't been closed yet.
+	CloseTime *time.Time
 }
 
 // TimerExecutionStatus is the Status of a TimerExecution, analogous to enums.WorkflowExecutionStatus.
@@ -461,17 +502,20 @@ var (
 	TIMER_STATUS_CANCELED TimerExecutionStatus = 2
 )
 
+// Update updates the TimerExecutionState with a HistoryEvent.
 func (t *TimerExecutionState) Update(event *history.HistoryEvent) {
 	switch event.EventType {
 	case enums.EVENT_TYPE_TIMER_STARTED:
 		attrs := event.GetTimerStartedEventAttributes()
 
+		t.StartToFireTimeout = attrs.StartToFireTimeout
 		t.TimerId = attrs.TimerId
 		if attrs.TimerId != strconv.FormatInt(event.EventId, 10) {
 			// If the user has set a custom id, we can use it for the name
-			t.Name = attrs.TimerId
+			t.Name = fmt.Sprintf("%s (%s)", attrs.TimerId, t.StartToFireTimeout.String())
+		} else {
+			t.Name = fmt.Sprintf("Timer (%s)", t.StartToFireTimeout.String())
 		}
-		t.StartToFireTimeout = attrs.StartToFireTimeout
 		t.Status = TIMER_STATUS_WAITING
 		t.StartTime = event.EventTime
 	case enums.EVENT_TYPE_TIMER_FIRED:
@@ -484,12 +528,7 @@ func (t *TimerExecutionState) Update(event *history.HistoryEvent) {
 }
 
 func (t *TimerExecutionState) GetName() string {
-	timerDuration := t.StartToFireTimeout.String()
-	if t.Name == "" {
-		return fmt.Sprintf("Timer (%s)", timerDuration)
-	} else {
-		return fmt.Sprintf("%s timer (%s)", t.Name, timerDuration)
-	}
+	return t.Name
 }
 
 func (t *TimerExecutionState) GetAttempt() int32 {
@@ -500,6 +539,7 @@ func (t *TimerExecutionState) GetFailure() *failure.Failure {
 	return nil
 }
 
+// GetRetryState will always return RETRY_STATE_UNSPECIFIED since Timers don't retry.
 func (t *TimerExecutionState) GetRetryState() enums.RetryState {
 	return enums.RETRY_STATE_UNSPECIFIED
 }
