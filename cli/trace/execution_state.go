@@ -199,8 +199,6 @@ func (state *WorkflowExecutionState) Update(event *history.HistoryEvent) {
 		state.Attempt = attrs.GetAttempt()
 		state.Type = attrs.GetWorkflowType()
 
-		// Not sure if this is the right RunId
-		state.Execution.RunId = attrs.OriginalExecutionRunId
 		state.ParentWorkflowExecution = attrs.ParentWorkflowExecution
 
 		// Cleanup the failure/cancel request
