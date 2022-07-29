@@ -17,9 +17,8 @@ var events = map[string]*history.HistoryEvent{
 		EventType: enums.EVENT_TYPE_WORKFLOW_EXECUTION_STARTED,
 		Attributes: &history.HistoryEvent_WorkflowExecutionStartedEventAttributes{
 			WorkflowExecutionStartedEventAttributes: &history.WorkflowExecutionStartedEventAttributes{
-				WorkflowType:           &common.WorkflowType{Name: "foo"},
-				Attempt:                1,
-				OriginalExecutionRunId: "bar",
+				WorkflowType: &common.WorkflowType{Name: "foo"},
+				Attempt:      1,
 			},
 		},
 	},
@@ -217,9 +216,8 @@ var events = map[string]*history.HistoryEvent{
 		EventType: enums.EVENT_TYPE_WORKFLOW_EXECUTION_STARTED,
 		Attributes: &history.HistoryEvent_WorkflowExecutionStartedEventAttributes{
 			WorkflowExecutionStartedEventAttributes: &history.WorkflowExecutionStartedEventAttributes{
-				WorkflowType:           &common.WorkflowType{Name: "baz"},
-				Attempt:                1,
-				OriginalExecutionRunId: "childRunId",
+				WorkflowType: &common.WorkflowType{Name: "baz"},
+				Attempt:      1,
 			},
 		},
 	},
@@ -274,7 +272,7 @@ func TestExecutionState_UpdateWorkflow(t *testing.T) {
 			events: []*history.HistoryEvent{events["started"]},
 			expectedState: &WorkflowExecutionState{
 				LastEventId: 1,
-				Execution:   &common.WorkflowExecution{WorkflowId: "foo", RunId: "bar"},
+				Execution:   &common.WorkflowExecution{WorkflowId: "foo"},
 				Type:        &common.WorkflowType{Name: "foo"},
 				Status:      enums.WORKFLOW_EXECUTION_STATUS_RUNNING,
 				Attempt:     1,
@@ -284,7 +282,7 @@ func TestExecutionState_UpdateWorkflow(t *testing.T) {
 			events: []*history.HistoryEvent{events["started"], events["completed"]},
 			expectedState: &WorkflowExecutionState{
 				LastEventId: 100,
-				Execution:   &common.WorkflowExecution{WorkflowId: "foo", RunId: "bar"},
+				Execution:   &common.WorkflowExecution{WorkflowId: "foo"},
 				Type:        &common.WorkflowType{Name: "foo"},
 				Status:      enums.WORKFLOW_EXECUTION_STATUS_COMPLETED,
 				Attempt:     1,
@@ -294,7 +292,7 @@ func TestExecutionState_UpdateWorkflow(t *testing.T) {
 			events: []*history.HistoryEvent{events["started"], events["failed"]},
 			expectedState: &WorkflowExecutionState{
 				LastEventId: 89,
-				Execution:   &common.WorkflowExecution{WorkflowId: "foo", RunId: "bar"},
+				Execution:   &common.WorkflowExecution{WorkflowId: "foo"},
 				Type:        &common.WorkflowType{Name: "foo"},
 				Status:      enums.WORKFLOW_EXECUTION_STATUS_FAILED,
 				Attempt:     1,
@@ -306,7 +304,7 @@ func TestExecutionState_UpdateWorkflow(t *testing.T) {
 			events: []*history.HistoryEvent{events["started"], events["cancel requested"]},
 			expectedState: &WorkflowExecutionState{
 				LastEventId: 89,
-				Execution:   &common.WorkflowExecution{WorkflowId: "foo", RunId: "bar"},
+				Execution:   &common.WorkflowExecution{WorkflowId: "foo"},
 				Type:        &common.WorkflowType{Name: "foo"},
 				Status:      enums.WORKFLOW_EXECUTION_STATUS_RUNNING, // There's no cancel requested status in Temporal's enums
 				CancelRequest: &history.WorkflowExecutionCancelRequestedEventAttributes{
@@ -320,7 +318,7 @@ func TestExecutionState_UpdateWorkflow(t *testing.T) {
 			events: []*history.HistoryEvent{events["started"], events["cancel requested"], events["canceled"]},
 			expectedState: &WorkflowExecutionState{
 				LastEventId: 90,
-				Execution:   &common.WorkflowExecution{WorkflowId: "foo", RunId: "bar"},
+				Execution:   &common.WorkflowExecution{WorkflowId: "foo"},
 				Type:        &common.WorkflowType{Name: "foo"},
 				Status:      enums.WORKFLOW_EXECUTION_STATUS_CANCELED,
 				CancelRequest: &history.WorkflowExecutionCancelRequestedEventAttributes{
@@ -580,6 +578,7 @@ func TestExecutionState_UpdateTimers(t *testing.T) {
 			events: []*history.HistoryEvent{events["started"], events["timer started"]},
 			expectedChilds: []ExecutionState{
 				&TimerExecutionState{
+					Name:               "Timer (1h0m0s)",
 					TimerId:            "20",
 					StartToFireTimeout: NewDuration(time.Hour),
 					Status:             TIMER_STATUS_WAITING,
@@ -590,6 +589,7 @@ func TestExecutionState_UpdateTimers(t *testing.T) {
 			events: []*history.HistoryEvent{events["started"], events["timer started"], events["timer fired"]},
 			expectedChilds: []ExecutionState{
 				&TimerExecutionState{
+					Name:               "Timer (1h0m0s)",
 					TimerId:            "20",
 					StartToFireTimeout: NewDuration(time.Hour),
 					Status:             TIMER_STATUS_FIRED,
@@ -600,6 +600,7 @@ func TestExecutionState_UpdateTimers(t *testing.T) {
 			events: []*history.HistoryEvent{events["started"], events["timer started"], events["timer canceled"]},
 			expectedChilds: []ExecutionState{
 				&TimerExecutionState{
+					Name:               "Timer (1h0m0s)",
 					TimerId:            "20",
 					StartToFireTimeout: NewDuration(time.Hour),
 					Status:             TIMER_STATUS_CANCELED,
@@ -640,7 +641,6 @@ func TestExecutionState_TimerExecutionStateImplementation(t *testing.T) {
 				StartTime:          NewTime(0),
 			},
 			Expected: expectations{
-				Name:       "Timer (1h0m0s)",
 				Attempt:    1,
 				Failure:    nil,
 				RetryState: 0,
@@ -657,7 +657,6 @@ func TestExecutionState_TimerExecutionStateImplementation(t *testing.T) {
 				CloseTime:          NewTime(time.Hour),
 			},
 			Expected: expectations{
-				Name:       "Timer (1h0m0s)",
 				Attempt:    1,
 				Failure:    nil,
 				RetryState: 0,
@@ -674,7 +673,6 @@ func TestExecutionState_TimerExecutionStateImplementation(t *testing.T) {
 				CloseTime:          NewTime(30 * time.Minute),
 			},
 			Expected: expectations{
-				Name:       "Timer (1h0m0s)",
 				Attempt:    1,
 				Failure:    nil,
 				RetryState: 0,
@@ -691,7 +689,7 @@ func TestExecutionState_TimerExecutionStateImplementation(t *testing.T) {
 				StartTime:          NewTime(0),
 			},
 			Expected: expectations{
-				Name:       "TestTimer timer (1h0m0s)",
+				Name:       "TestTimer",
 				Attempt:    1,
 				Failure:    nil,
 				RetryState: 0,
