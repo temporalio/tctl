@@ -758,3 +758,28 @@ func AdminRefreshWorkflowTasks(c *cli.Context) {
 		fmt.Println("Refresh workflow task succeeded.")
 	}
 }
+
+// AdminRebuildMutableState rebuild a workflow mutable state using persisted history events
+func AdminRebuildMutableState(c *cli.Context) {
+	adminClient := cFactory.AdminClient(c)
+
+	namespace := getRequiredGlobalOption(c, FlagNamespace)
+	wid := getRequiredOption(c, FlagWorkflowID)
+	rid := c.String(FlagRunID)
+
+	ctx, cancel := newContext(c)
+	defer cancel()
+
+	_, err := adminClient.RebuildMutableState(ctx, &adminservice.RebuildMutableStateRequest{
+		Namespace: namespace,
+		Execution: &commonpb.WorkflowExecution{
+			WorkflowId: wid,
+			RunId:      rid,
+		},
+	})
+	if err != nil {
+		ErrorAndExit("Rebuild mutable state failed", err)
+	} else {
+		fmt.Println("Rebuild mutable state succeeded.")
+	}
+}
