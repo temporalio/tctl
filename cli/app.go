@@ -148,34 +148,10 @@ func NewCliApp() *cli.App {
 			promptContinueWithoutConfig()
 		}
 	}
-	populateFlagsFromConfig(app.Commands)
+	populateFlags(app.Commands, app.Flags)
 	useDynamicCommands(app)
 
 	return app
-}
-
-func populateFlagsFromConfig(commands []*cli.Command) {
-	for _, command := range commands {
-		populateFlagsFromConfig(command.Subcommands)
-		command.Before = withConfigValues(command)
-	}
-}
-
-func withConfigValues(command *cli.Command) func(ctx *cli.Context) error {
-	return func(ctx *cli.Context) error {
-		for _, flag := range command.Flags {
-			name := flag.Names()[0]
-			if !ctx.IsSet(name) {
-				value, _ := tctlConfig.GetByCurrentEnvironment(name)
-				if value != "" {
-					ctx.Set(name, value)
-				}
-			}
-
-		}
-
-		return nil
-	}
 }
 
 func configureSDK(ctx *cli.Context) error {
