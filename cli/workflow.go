@@ -70,7 +70,7 @@ func newWorkflowCommands() []*cli.Command {
 		{
 			Name:    "list",
 			Aliases: []string{"l"},
-			Usage:   "List Workflow Executions based on a query",
+			Usage:   "List Workflow Executions based on a Query",
 			Flags:   append(flagsForWorkflowFiltering, flags.FlagsForPaginationAndRendering...),
 			Action: func(c *cli.Context) error {
 				return ListWorkflow(c)
