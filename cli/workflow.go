@@ -52,7 +52,7 @@ func newWorkflowCommands() []*cli.Command {
 		{
 			Name:    "describe",
 			Aliases: []string{"d"},
-			Usage:   "Show a Workflow Execution info",
+			Usage:   "Show information about a Workflow Execution",
 			Flags: append(flagsForExecution, []cli.Flag{
 				&cli.BoolFlag{
 					Name:  FlagResetPointsOnly,
@@ -78,7 +78,7 @@ func newWorkflowCommands() []*cli.Command {
 		},
 		{
 			Name:  "show",
-			Usage: "Show a Workflow Execution history",
+			Usage: "Show Event History for a Workflow Execution",
 			Flags: append(append(flagsForExecution, flagsForShowWorkflow...), flags.FlagsForPaginationAndRendering...),
 			Action: func(c *cli.Context) error {
 				return ShowHistory(c)
