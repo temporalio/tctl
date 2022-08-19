@@ -29,13 +29,9 @@ clean:
 	@rm -f tctl tctl-authorization-plugin
 
 ##### Test #####
-TEST_TIMEOUT := 20m
-ALL_SRC         := $(shell find . -name "*.go")
-TEST_DIRS       := $(sort $(dir $(filter %_test.go,$(ALL_SRC))))
-
 test:
 	@printf $(COLOR) "Running unit tests..."
-	go test ./...
+	go test ./... -race
 
 ##### Checks #####
 
