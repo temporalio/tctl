@@ -34,6 +34,17 @@ const (
 	testEnvName = "tctl-test-env"
 )
 
+func ExampleCurrentEnv() {
+	tctl := NewCliApp()
+
+	tctl.Run([]string{"", "config", "use-env", testEnvName})
+	tctl.Run([]string{"", "config", "current-env"})
+
+	// Output:
+	// current-env: tctl-test-env
+	// tctl-test-env
+}
+
 func (s *cliAppSuite) TestUseEnv() {
 	err := s.app.Run([]string{"", "config", "use-env", testEnvName})
 	s.NoError(err)

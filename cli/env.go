@@ -37,8 +37,16 @@ import (
 func newEnvCommands() []*cli.Command {
 	return []*cli.Command{
 		{
+			Name:  "current-env",
+			Usage: "Show current environment",
+			Flags: []cli.Flag{},
+			Action: func(c *cli.Context) error {
+				return CurrentEnv(c)
+			},
+		},
+		{
 			Name:  "show-env",
-			Usage: "Show env properties",
+			Usage: "Show environment properties",
 			Flags: []cli.Flag{},
 			Action: func(c *cli.Context) error {
 				return ShowEnv(c)
@@ -46,13 +54,24 @@ func newEnvCommands() []*cli.Command {
 		},
 		{
 			Name:  "use-env",
-			Usage: "Switch env",
+			Usage: "Switch environment",
 			Flags: []cli.Flag{},
 			Action: func(c *cli.Context) error {
 				return UseEnv(c)
 			},
 		},
 	}
+}
+
+func CurrentEnv(c *cli.Context) error {
+	envName, err := tctlConfig.Get(config.KeyCurrentEnvironment)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(envName)
+
+	return nil
 }
 
 func ShowEnv(c *cli.Context) error {
