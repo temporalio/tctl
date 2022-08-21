@@ -47,7 +47,13 @@ func newEnvCommands() []*cli.Command {
 		{
 			Name:  "show-env",
 			Usage: "Show environment properties",
-			Flags: []cli.Flag{},
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    output.FlagOutput,
+					Aliases: []string{"o"},
+					Usage:   output.UsageText,
+				},
+			},
 			Action: func(c *cli.Context) error {
 				return ShowEnv(c)
 			},
