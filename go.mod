@@ -14,7 +14,7 @@ require (
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/pborman/uuid v1.2.1
 	github.com/stretchr/testify v1.8.0
-	github.com/temporalio/tctl-kit v0.0.0-20220819010806-cd141a8da413
+	github.com/temporalio/tctl-kit v0.0.0-20220820043607-ce6822af0b23
 	github.com/urfave/cli v1.22.9
 	github.com/urfave/cli/v2 v2.10.2
 	go.temporal.io/api v1.10.0

@@ -38,15 +38,16 @@ func newEnvCommands() []*cli.Command {
 	return []*cli.Command{
 		{
 			Name:  "current-env",
-			Usage: "Show current environment",
+			Usage: "Print the current environment name",
 			Flags: []cli.Flag{},
 			Action: func(c *cli.Context) error {
 				return CurrentEnv(c)
 			},
 		},
 		{
-			Name:  "show-env",
-			Usage: "Show environment properties",
+			Name:      "show-env",
+			Usage:     "Print environment properties",
+			ArgsUsage: " [ENV NAME]",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:    output.FlagOutput,
@@ -59,9 +60,10 @@ func newEnvCommands() []*cli.Command {
 			},
 		},
 		{
-			Name:  "use-env",
-			Usage: "Switch environment",
-			Flags: []cli.Flag{},
+			Name:      "use-env",
+			Usage:     "Switch environment",
+			Flags:     []cli.Flag{},
+			ArgsUsage: " [ENV NAME]",
 			Action: func(c *cli.Context) error {
 				return UseEnv(c)
 			},
