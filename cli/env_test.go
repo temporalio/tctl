@@ -25,58 +25,50 @@
 package cli
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 const (
 	testEnvName = "tctl-test-env"
 )
 
-func (s *cliAppSuite) TestEnvUseEnv() {
+func (s *cliAppSuite) TestUseEnv() {
 	err := s.app.Run([]string{"", "config", "use-env", testEnvName})
 	s.NoError(err)
 
-	config := readConfig(s.T())
+	config := readConfig()
 	s.Contains(config, "current-env: "+testEnvName)
 }
 
-func (s *cliAppSuite) TestEnvShowEnv() {
-	err := s.app.Run([]string{"", "config", "use-env", testEnvName})
-	s.NoError(err)
+func ExampleShowEnv() {
+	tctl := NewCliApp()
 
-	err = s.app.Run([]string{"", "config", "set", "env." + testEnvName + ".namespace", "tctl-test-namespace"})
-	s.NoError(err)
+	tctl.Run([]string{"", "config", "use-env", testEnvName})
+	tctl.Run([]string{"", "config", "set", "env." + testEnvName + ".namespace", "tctl-test-namespace"})
 
-	err = s.app.Run([]string{"", "config", "set", "env." + testEnvName + ".address", "0.0.0.0:0000"})
-	s.NoError(err)
-
-	err = s.app.Run([]string{"", "config", "show-env", testEnvName})
-	s.NoError(err)
-
-	config := readConfig(s.T())
-	s.Contains(config, `  tctl-test-env:
-    address: 0.0.0.0:0000
-    namespace: tctl-test-namespace`)
+	tctl.Run([]string{"", "config", "show-env", testEnvName})
+	// Output:
+	// current-env: tctl-test-env
+	// env.tctl-test-env.namespace: tctl-test-namespace
+	//   namespace  tctl-test-namespace
 }
 
-func readConfig(t *testing.T) string {
-	path := getConfigPath(t)
-	content, err := ioutil.ReadFile(path)
+func readConfig() string {
+	path := getConfigPath()
+	content, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return string(content)
 }
 
-func getConfigPath(t *testing.T) string {
+func getConfigPath() string {
 	dpath, err := os.UserHomeDir()
-	assert.NoError(t, err)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	path := filepath.Join(dpath, ".config", "temporalio", "tctl.yaml")
 
