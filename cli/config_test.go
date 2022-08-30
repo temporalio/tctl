@@ -42,7 +42,7 @@ func ExampleEnvProperty() {
 
 	// Output:
 	// current-env: tctl-test-env
-	// namespace: tctl-test-namespace
+	// Set 'namespace' to: tctl-test-namespace
 	// tctl-test-namespace
 	// current-env: local
 	// Removed env tctl-test-env

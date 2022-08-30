@@ -56,6 +56,6 @@ func ExampleShowEnv() {
 	tctl.Run([]string{"", "config", "show-env", testEnvName})
 	// Output:
 	// current-env: tctl-test-env
-	// namespace: tctl-test-namespace
+	// Set 'namespace' to: tctl-test-namespace
 	//   namespace  tctl-test-namespace
 }
