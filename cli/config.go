@@ -82,16 +82,16 @@ func SetEnvProperty(c *cli.Context) error {
 	fullKey := c.Args().Get(0)
 	val := c.Args().Get(1)
 
-	if err := validateEnvKey(fullKey); err != nil {
-		return err
-	}
-
 	if fullKey == "version" {
 		if err := tctlConfig.SetVersion(val); err != nil {
 			return fmt.Errorf("unable to set version: %s", err)
 		}
 
 		return nil
+	}
+
+	if err := validateEnvKey(fullKey); err != nil {
+		return err
 	}
 
 	env, key := envKey(fullKey)
@@ -111,6 +111,10 @@ func validateEnvKey(fullKey string) error {
 		return fmt.Errorf("invalid env key %v. Env key must be in a format <env-name> or env.<env name>.<property-name>", fullKey)
 	}
 
+	if len(keys) == 3 && keys[0] != config.KeyEnvironment {
+		return fmt.Errorf("invalid env key %v. Env key must be in a format <env-name> or env.<env name>.<property-name>", fullKey)
+	}
+
 	return nil
 }
 
@@ -121,7 +125,7 @@ func envKey(fullKey string) (string, string) {
 	if len(keys) == 1 {
 		env = tctlConfig.CurrentEnv
 		key = keys[0]
-	} else if len(keys) == 3 && keys[0] == config.KeyEnvironment {
+	} else if len(keys) == 3 {
 		env = keys[1]
 		key = keys[2]
 	}
