@@ -100,7 +100,7 @@ func SetEnvProperty(c *cli.Context) error {
 		return fmt.Errorf("unable to set env property %v. %s", key, err)
 	}
 
-	fmt.Printf("%v: %v\n", key, val)
+	fmt.Printf("Set '%v' to: %v\n", fullKey, val)
 	return nil
 }
 
