@@ -112,9 +112,67 @@ func ListTaskQueuePartitions(c *cli.Context) error {
 }
 
 func UpdateWorkerBuildIDVersionGraph(c *cli.Context) error {
-	panic("not implemented")
+	frontendClient := cFactory.FrontendClient(c)
+	namespace, err := getRequiredGlobalOption(c, FlagNamespace)
+	if err != nil {
+		return err
+	}
+	taskQueue := c.String(FlagTaskQueue)
+	workerBuildID := c.String(FlagWorkerBuildId)
+	prevCompat := c.String(FlagWorkerBuildIdPreviousCompat)
+	becomeDefault := c.Bool(FlagWorkerBuildIdMakeDefault)
+
+	ctx, cancel := newContext(c)
+	defer cancel()
+
+	var prevCompatID *taskqueuepb.VersionId
+	if prevCompat != "" {
+		prevCompatID = &taskqueuepb.VersionId{
+			WorkerBuildId: prevCompat,
+		}
+	}
+	request := &workflowservice.UpdateWorkerBuildIdOrderingRequest{
+		Namespace:          namespace,
+		TaskQueue:          taskQueue,
+		VersionId:          &taskqueuepb.VersionId{WorkerBuildId: workerBuildID},
+		PreviousCompatible: prevCompatID,
+		BecomeDefault:      becomeDefault,
+	}
+
+	_, err = frontendClient.UpdateWorkerBuildIdOrdering(ctx, request)
+	if err != nil {
+		return fmt.Errorf("failed to update worker build id version graph: %s", err)
+	}
+
+	fmt.Println(color.Green(c, "Successfully updated version graph"))
+
+	return nil
 }
 
 func GetWorkerBuildIDVersionGraph(c *cli.Context) error {
-	panic("not implemented")
+	frontendClient := cFactory.FrontendClient(c)
+	namespace, err := getRequiredGlobalOption(c, FlagNamespace)
+	if err != nil {
+		return err
+	}
+	taskQueue := c.String(FlagTaskQueue)
+	maxDepth := c.Uint(FlagGetBuildIDGraphMaxDepth)
+
+	ctx, cancel := newContext(c)
+	defer cancel()
+
+	request := &workflowservice.GetWorkerBuildIdOrderingRequest{
+		Namespace: namespace,
+		TaskQueue: taskQueue,
+		MaxDepth:  int32(maxDepth),
+	}
+
+	resp, err := frontendClient.GetWorkerBuildIdOrdering(ctx, request)
+	if err != nil {
+		return fmt.Errorf("failed to get worker build id version graph: %s", err)
+	}
+
+	prettyPrintJSONObject(resp)
+
+	return nil
 }

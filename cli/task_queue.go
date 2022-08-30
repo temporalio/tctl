@@ -110,7 +110,7 @@ func newTaskQueueCommands() []*cli.Command {
 		{
 			Name:    "get-versions",
 			Aliases: []string{"gv"},
-			Usage:   "Fetches the Task Queue's worker build id version graph",
+			Usage:   "Fetches the Task Queue's worker build id version graph as JSON",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     FlagTaskQueue,
