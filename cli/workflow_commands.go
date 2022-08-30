@@ -161,10 +161,10 @@ func StartWorkflow(c *cli.Context, printProgress bool) error {
 	}
 	fmt.Println(color.Magenta(c, "Running execution:"))
 	opts := &output.PrintOptions{
-		Fields:      []string{"WorkflowId", "RunId", "Type", "Namespace", "TaskQueue", "Args"},
-		ForceFields: true,
-		Output:      output.Card,
-		Separator:   "",
+		Fields:       []string{"WorkflowId", "RunId", "Type", "Namespace", "TaskQueue", "Args"},
+		ForceFields:  true,
+		OutputFormat: output.Card,
+		Separator:    "",
 	}
 	output.PrintItems(c, data, opts)
 
