@@ -35,7 +35,7 @@ func newTaskQueueCommands() []*cli.Command {
 		{
 			Name:    "describe",
 			Aliases: []string{"d"},
-			Usage:   "Describe pollers info of task queue",
+			Usage:   "Describe the Task Queue and its pollers",
 			Flags: append([]cli.Flag{
 				&cli.StringFlag{
 					Name:     FlagTaskQueue,
@@ -57,7 +57,7 @@ func newTaskQueueCommands() []*cli.Command {
 		{
 			Name:    "list-partition",
 			Aliases: []string{"lp"},
-			Usage:   "List all the taskqueue partitions and the hostname for partitions",
+			Usage:   "List all the Task Queue partitions and the hostname for partitions",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     FlagTaskQueue,
@@ -74,6 +74,59 @@ func newTaskQueueCommands() []*cli.Command {
 			},
 			Action: func(c *cli.Context) error {
 				return ListTaskQueuePartitions(c)
+			},
+		},
+		{
+			Name:    "update-versions",
+			Aliases: []string{"uv"},
+			Usage:   "Update the Task Queue's worker build id version graph",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     FlagTaskQueue,
+					Aliases:  FlagTaskQueueAlias,
+					Usage:    "Task Queue name",
+					Required: true,
+				},
+				&cli.StringFlag{
+					Name:     FlagWorkerBuildId,
+					Aliases:  FlagWorkerBuildIdAlias,
+					Usage:    "Worker build id to add or modify",
+					Required: true,
+				},
+				&cli.BoolFlag{
+					Name:  FlagWorkerBuildIdMakeDefault,
+					Usage: "If set, make this build id the default version for new workflows started on the task queue",
+				},
+				&cli.StringFlag{
+					Name: FlagWorkerBuildIdPreviousCompat,
+					Usage: "If set, indicates that this version should be considered compatible with the version" +
+						" provided by this flag.",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				return UpdateWorkerBuildIDVersionGraph(c)
+			},
+		},
+		{
+			Name:    "get-versions",
+			Aliases: []string{"gv"},
+			Usage:   "Fetches the Task Queue's worker build id version graph",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     FlagTaskQueue,
+					Aliases:  FlagTaskQueueAlias,
+					Usage:    "Task Queue name",
+					Required: true,
+				},
+				&cli.UintFlag{
+					Name: FlagGetBuildIDGraphMaxDepth,
+					Usage: "If set nonzero, limit the depth of the fetched graph. The limit applies to each branch in " +
+						"the DAG, so a value of 1 will return the current default, and one node of each compatible " +
+						"branch, if any.",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				return GetWorkerBuildIDVersionGraph(c)
 			},
 		},
 	}

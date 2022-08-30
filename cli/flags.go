@@ -254,6 +254,11 @@ var (
 	FlagNoFold                        = "no-fold"
 	FlagDepth                         = "depth"
 	FlagDepthAlias                    = []string{"d"}
+	FlagWorkerBuildId                 = "build-id"
+	FlagWorkerBuildIdAlias            = []string{"bid"}
+	FlagWorkerBuildIdMakeDefault      = "set-default"
+	FlagWorkerBuildIdPreviousCompat   = "previous-compatible"
+	FlagGetBuildIDGraphMaxDepth       = "max-depth"
 
 	FlagProtoType  = "type"
 	FlagHexData    = "hex-data"

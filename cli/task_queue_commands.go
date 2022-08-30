@@ -110,3 +110,11 @@ func ListTaskQueuePartitions(c *cli.Context) error {
 	output.PrintItems(c, items, optsA)
 	return nil
 }
+
+func UpdateWorkerBuildIDVersionGraph(c *cli.Context) error {
+	panic("not implemented")
+}
+
+func GetWorkerBuildIDVersionGraph(c *cli.Context) error {
+	panic("not implemented")
+}
