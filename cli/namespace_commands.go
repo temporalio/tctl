@@ -25,6 +25,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -42,9 +43,10 @@ import (
 
 // RegisterNamespace register a namespace
 func RegisterNamespace(c *cli.Context) error {
-	namespace, err := getRequiredGlobalOption(c, FlagNamespace)
-	if err != nil {
-		return err
+	ns := c.Args().First()
+
+	if ns == "" {
+		return errors.New("provide namespace name as an argument")
 	}
 
 	description := c.String(FlagDescription)
@@ -53,6 +55,7 @@ func RegisterNamespace(c *cli.Context) error {
 	client := cFactory.FrontendClient(c)
 
 	retention := defaultNamespaceRetention
+	var err error
 	if c.IsSet(FlagRetention) {
 		retention, err = timestamp.ParseDurationDefaultDays(c.String(FlagRetention))
 		if err != nil {
@@ -111,7 +114,7 @@ func RegisterNamespace(c *cli.Context) error {
 	}
 
 	request := &workflowservice.RegisterNamespaceRequest{
-		Namespace:                        namespace,
+		Namespace:                        ns,
 		Description:                      description,
 		OwnerEmail:                       ownerEmail,
 		Data:                             namespaceData,
@@ -132,10 +135,10 @@ func RegisterNamespace(c *cli.Context) error {
 		if _, ok := err.(*serviceerror.NamespaceAlreadyExists); !ok {
 			return fmt.Errorf("namespace registration failed: %s", err)
 		} else {
-			return fmt.Errorf("namespace %s is already registered: %s", namespace, err)
+			return fmt.Errorf("namespace %s is already registered: %s", ns, err)
 		}
 	} else {
-		fmt.Printf("Namespace %s successfully registered.\n", namespace)
+		fmt.Printf("Namespace %s successfully registered.\n", ns)
 	}
 
 	return nil
@@ -143,9 +146,10 @@ func RegisterNamespace(c *cli.Context) error {
 
 // UpdateNamespace updates a namespace
 func UpdateNamespace(c *cli.Context) error {
-	namespace, err := getRequiredGlobalOption(c, FlagNamespace)
-	if err != nil {
-		return err
+	ns := c.Args().First()
+
+	if ns == "" {
+		return errors.New("provide namespace name as an argument")
 	}
 
 	client := cFactory.FrontendClient(c)
@@ -156,9 +160,9 @@ func UpdateNamespace(c *cli.Context) error {
 
 	if c.IsSet(FlagPromoteNamespace) && c.Bool(FlagPromoteNamespace) {
 		fmt.Printf("Will promote local namespace to global namespace for:%s, other flag will be omitted. "+
-			"If it is already global namespace, this will be no-op.\n", namespace)
+			"If it is already global namespace, this will be no-op.\n", ns)
 		updateRequest = &workflowservice.UpdateNamespaceRequest{
-			Namespace:        namespace,
+			Namespace:        ns,
 			PromoteNamespace: true,
 		}
 	} else if c.IsSet(FlagActiveClusterName) {
@@ -168,12 +172,12 @@ func UpdateNamespace(c *cli.Context) error {
 			ActiveClusterName: activeCluster,
 		}
 		updateRequest = &workflowservice.UpdateNamespaceRequest{
-			Namespace:         namespace,
+			Namespace:         ns,
 			ReplicationConfig: replicationConfig,
 		}
 	} else {
 		resp, err := client.DescribeNamespace(ctx, &workflowservice.DescribeNamespaceRequest{
-			Namespace: namespace,
+			Namespace: ns,
 		})
 		if err != nil {
 			switch err.(type) {
@@ -270,7 +274,7 @@ func UpdateNamespace(c *cli.Context) error {
 			Clusters: clusters,
 		}
 		updateRequest = &workflowservice.UpdateNamespaceRequest{
-			Namespace:         namespace,
+			Namespace:         ns,
 			UpdateInfo:        updateInfo,
 			Config:            updateConfig,
 			ReplicationConfig: replicationConfig,
@@ -278,7 +282,7 @@ func UpdateNamespace(c *cli.Context) error {
 		}
 	}
 
-	_, err = client.UpdateNamespace(ctx, updateRequest)
+	_, err := client.UpdateNamespace(ctx, updateRequest)
 	if err != nil {
 		switch err.(type) {
 		case *serviceerror.NamespaceNotFound:
@@ -287,7 +291,7 @@ func UpdateNamespace(c *cli.Context) error {
 			return fmt.Errorf("namespace update failed: %s", err)
 		}
 	} else {
-		fmt.Printf("Namespace %s successfully updated.\n", namespace)
+		fmt.Printf("Namespace %s successfully updated.\n", ns)
 	}
 
 	return nil
@@ -295,15 +299,15 @@ func UpdateNamespace(c *cli.Context) error {
 
 // DescribeNamespace updates a namespace
 func DescribeNamespace(c *cli.Context) error {
-	namespace := c.String(FlagNamespace)
-	namespaceID := c.String(FlagNamespaceID)
+	ns := c.Args().First()
+	nsID := c.String(FlagNamespaceID)
 
-	if namespaceID == "" && namespace == "" {
-		return fmt.Errorf("provide either %s or %s flag", FlagNamespaceID, FlagNamespace)
+	if nsID == "" && ns == "" {
+		return fmt.Errorf("provide either %s flag or namespace as an argument", FlagNamespaceID)
 	}
 
-	if namespaceID != "" {
-		namespace = ""
+	if nsID != "" {
+		ns = ""
 	}
 
 	client := cFactory.FrontendClient(c)
@@ -311,8 +315,8 @@ func DescribeNamespace(c *cli.Context) error {
 	ctx, cancel := newContext(c)
 	defer cancel()
 	resp, err := client.DescribeNamespace(ctx, &workflowservice.DescribeNamespaceRequest{
-		Namespace: namespace,
-		Id:        namespaceID,
+		Namespace: ns,
+		Id:        nsID,
 	})
 	if err != nil {
 		switch err.(type) {
@@ -346,10 +350,10 @@ func ListNamespaces(c *cli.Context) error {
 
 // DeleteNamespace deletes namespace.
 func DeleteNamespace(c *cli.Context) error {
-	ns := c.String(FlagNamespace)
+	ns := c.Args().First()
 
 	if ns == "" {
-		return fmt.Errorf("provide %s flag", FlagNamespace)
+		return errors.New("provide namespace name as an argument")
 	}
 
 	promptMsg := color.Red(c, "Are you sure you want to delete namespace %s? Type namespace name to confirm:", ns)
