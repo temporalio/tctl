@@ -73,7 +73,6 @@ var (
 	FlagWorkflowTaskTimeout           = "task-timeout"
 	FlagWorkflowTaskTimeoutAlias      = []string{"tt"}
 	FlagContextTimeout                = "context-timeout"
-	FlagContextTimeoutAlias           = []string{"ct"}
 	FlagInput                         = "input"
 	FlagInputAlias                    = []string{"i"}
 	FlagInputFile                     = "input-file"
