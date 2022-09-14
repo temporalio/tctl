@@ -72,7 +72,7 @@ func newNamespaceCommands() []*cli.Command {
 			Name:      "describe",
 			Usage:     "Describe a Namespace by name or Id",
 			Flags:     describeNamespaceFlags,
-			ArgsUsage: "namespace-name",
+			ArgsUsage: "[NAMESPACE NAME]",
 			Action: func(c *cli.Context) error {
 				return DescribeNamespace(c)
 			},
@@ -90,7 +90,7 @@ func newNamespaceCommands() []*cli.Command {
 			Name:      "register",
 			Usage:     "Register a new Namespace",
 			Flags:     registerNamespaceFlags,
-			ArgsUsage: "namespace-name",
+			ArgsUsage: "[NAMESPACE NAME]",
 			Action: func(c *cli.Context) error {
 				return RegisterNamespace(c)
 			},
@@ -99,7 +99,7 @@ func newNamespaceCommands() []*cli.Command {
 			Name:      "update",
 			Usage:     "Update a Namespace",
 			Flags:     updateNamespaceFlags,
-			ArgsUsage: "namespace-name",
+			ArgsUsage: "[NAMESPACE NAME]",
 			Action: func(c *cli.Context) error {
 				return UpdateNamespace(c)
 			},
@@ -108,7 +108,7 @@ func newNamespaceCommands() []*cli.Command {
 			Name:      "delete",
 			Usage:     "Delete existing Namespace",
 			Flags:     deleteNamespacesFlags,
-			ArgsUsage: "namespace-name",
+			ArgsUsage: "[NAMESPACE NAME]",
 			Action: func(c *cli.Context) error {
 				return DeleteNamespace(c)
 			},
