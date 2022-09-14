@@ -32,7 +32,7 @@ import (
 )
 
 // by default we don't require any namespace data. But this can be overridden by calling SetRequiredNamespaceDataKeys()
-var requiredNamespaceDataKeys = []string{}
+var requiredNamespaceDataKeys []string
 
 // SetRequiredNamespaceDataKeys will set requiredNamespaceDataKeys
 func SetRequiredNamespaceDataKeys(keys []string) {
@@ -72,7 +72,7 @@ func newNamespaceCommands() []*cli.Command {
 			Name:      "describe",
 			Usage:     "Describe a Namespace by name or Id",
 			Flags:     describeNamespaceFlags,
-			ArgsUsage: "[NAMESPACE NAME]",
+			ArgsUsage: "namespace_name",
 			Action: func(c *cli.Context) error {
 				return DescribeNamespace(c)
 			},
@@ -90,7 +90,7 @@ func newNamespaceCommands() []*cli.Command {
 			Name:      "register",
 			Usage:     "Register a new Namespace",
 			Flags:     registerNamespaceFlags,
-			ArgsUsage: "[NAMESPACE NAME]",
+			ArgsUsage: "namespace_name [cluster_name...]",
 			Action: func(c *cli.Context) error {
 				return RegisterNamespace(c)
 			},
@@ -99,7 +99,7 @@ func newNamespaceCommands() []*cli.Command {
 			Name:      "update",
 			Usage:     "Update a Namespace",
 			Flags:     updateNamespaceFlags,
-			ArgsUsage: "[NAMESPACE NAME]",
+			ArgsUsage: "namespace_name [cluster_name...]",
 			Action: func(c *cli.Context) error {
 				return UpdateNamespace(c)
 			},
@@ -108,7 +108,7 @@ func newNamespaceCommands() []*cli.Command {
 			Name:      "delete",
 			Usage:     "Delete existing Namespace",
 			Flags:     deleteNamespacesFlags,
-			ArgsUsage: "[NAMESPACE NAME]",
+			ArgsUsage: "namespace_name",
 			Action: func(c *cli.Context) error {
 				return DeleteNamespace(c)
 			},

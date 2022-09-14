@@ -43,10 +43,9 @@ import (
 
 // RegisterNamespace register a namespace
 func RegisterNamespace(c *cli.Context) error {
-	ns := c.Args().First()
-
-	if ns == "" {
-		return errors.New("provide namespace name as an argument")
+	ns, err := getNamespaceFromArgs(c)
+	if err != nil {
+		return err
 	}
 
 	description := c.String(FlagDescription)
@@ -55,7 +54,6 @@ func RegisterNamespace(c *cli.Context) error {
 	client := cFactory.FrontendClient(c)
 
 	retention := defaultNamespaceRetention
-	var err error
 	if c.IsSet(FlagRetention) {
 		retention, err = timestamp.ParseDurationDefaultDays(c.String(FlagRetention))
 		if err != nil {
@@ -97,7 +95,7 @@ func RegisterNamespace(c *cli.Context) error {
 		clusters = append(clusters, &replicationpb.ClusterReplicationConfig{
 			ClusterName: clusterStr,
 		})
-		for _, clusterStr := range c.Args().Slice() {
+		for _, clusterStr := range c.Args().Slice()[1:] { // First element is namespace name.
 			clusters = append(clusters, &replicationpb.ClusterReplicationConfig{
 				ClusterName: clusterStr,
 			})
@@ -146,10 +144,9 @@ func RegisterNamespace(c *cli.Context) error {
 
 // UpdateNamespace updates a namespace
 func UpdateNamespace(c *cli.Context) error {
-	ns := c.Args().First()
-
-	if ns == "" {
-		return errors.New("provide namespace name as an argument")
+	ns, err := getNamespaceFromArgs(c)
+	if err != nil {
+		return err
 	}
 
 	client := cFactory.FrontendClient(c)
@@ -218,7 +215,7 @@ func UpdateNamespace(c *cli.Context) error {
 			clusters = append(clusters, &replicationpb.ClusterReplicationConfig{
 				ClusterName: clusterStr,
 			})
-			for _, clusterStr := range c.Args().Slice() {
+			for _, clusterStr := range c.Args().Slice()[1:] { // First element is namespace name.
 				clusters = append(clusters, &replicationpb.ClusterReplicationConfig{
 					ClusterName: clusterStr,
 				})
@@ -282,7 +279,7 @@ func UpdateNamespace(c *cli.Context) error {
 		}
 	}
 
-	_, err := client.UpdateNamespace(ctx, updateRequest)
+	_, err = client.UpdateNamespace(ctx, updateRequest)
 	if err != nil {
 		switch err.(type) {
 		case *serviceerror.NamespaceNotFound:
@@ -299,15 +296,9 @@ func UpdateNamespace(c *cli.Context) error {
 
 // DescribeNamespace updates a namespace
 func DescribeNamespace(c *cli.Context) error {
-	ns := c.Args().First()
-	nsID := c.String(FlagNamespaceID)
-
-	if nsID == "" && ns == "" {
-		return fmt.Errorf("provide either %s flag or namespace as an argument", FlagNamespaceID)
-	}
-
-	if nsID != "" {
-		ns = ""
+	ns, nsID, err := getNamespaceFromIDArgs(c)
+	if err != nil {
+		return err
 	}
 
 	client := cFactory.FrontendClient(c)
@@ -350,10 +341,9 @@ func ListNamespaces(c *cli.Context) error {
 
 // DeleteNamespace deletes namespace.
 func DeleteNamespace(c *cli.Context) error {
-	ns := c.Args().First()
-
-	if ns == "" {
-		return errors.New("provide namespace name as an argument")
+	ns, err := getNamespaceFromArgs(c)
+	if err != nil {
+		return err
 	}
 
 	promptMsg := color.Red(c, "Are you sure you want to delete namespace %s? Type namespace name to confirm:", ns)
@@ -364,7 +354,7 @@ func DeleteNamespace(c *cli.Context) error {
 	client := cFactory.OperatorClient(c)
 	ctx, cancel := newContext(c)
 	defer cancel()
-	_, err := client.DeleteNamespace(ctx, &operatorservice.DeleteNamespaceRequest{
+	_, err = client.DeleteNamespace(ctx, &operatorservice.DeleteNamespaceRequest{
 		Namespace: ns,
 	})
 	if err != nil {
@@ -448,4 +438,36 @@ func archivalState(c *cli.Context, stateFlagName string) (enumspb.ArchivalState,
 		}
 	}
 	return enumspb.ARCHIVAL_STATE_UNSPECIFIED, nil
+}
+
+func getNamespaceFromArgs(c *cli.Context) (string, error) {
+	ns := c.Args().First()
+	if ns == "" {
+		errMessage := "provide namespace as an argument"
+		if c.IsSet(FlagNamespace) {
+			errMessage = fmt.Sprintf("%s. Global flag '%s' is not supported by namespace commands", errMessage, FlagNamespace)
+		}
+		return "", errors.New(errMessage)
+	}
+	return ns, nil
+}
+
+func getNamespaceFromIDArgs(c *cli.Context) (string, string, error) {
+	ns := c.Args().First()
+	nsID := c.String(FlagNamespaceID)
+
+	if nsID == "" && ns == "" {
+		errMessage := fmt.Sprintf("provide either %s flag or namespace as an argument", FlagNamespaceID)
+		if c.IsSet(FlagNamespace) {
+			errMessage = fmt.Sprintf("%s. Global flag '%s' is not supported by namespace commands", errMessage, FlagNamespace)
+		}
+		return "", "", errors.New(errMessage)
+	}
+
+	if nsID != "" && ns != "" {
+		fmt.Println(color.Yellow(c, "Both %s flag and namespace are provided. Will use namespace Id to describe namespace", FlagNamespaceID))
+		ns = ""
+	}
+
+	return ns, nsID, nil
 }
