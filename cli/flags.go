@@ -33,132 +33,118 @@ import (
 
 // Flags used to specify cli command line arguments
 var (
-	FlagUsername                     = "username"
-	FlagPassword                     = "password"
-	FlagKeyspace                     = "keyspace"
-	FlagAddress                      = "address"
-	FlagAuth                         = "auth"
-	FlagNamespaceID                  = "namespace-id"
-	FlagNamespace                    = "namespace"
-	FlagNamespaceAlias               = []string{"n"}
-	FlagWorkflowID                   = "workflow-id"
-	FlagWorkflowIDAlias              = []string{"wid"}
-	FlagRunID                        = "run-id"
-	FlagRunIDAlias                   = []string{"rid"}
-	FlagTaskQueue                    = "task-queue"
-	FlagTaskQueueAlias               = []string{"tq"}
-	FlagTaskQueueType                = "task-queue-type"
-	FlagTaskQueueTypeAlias           = []string{"tqt"}
-	FlagWorkflowIDReusePolicy        = "workflow-id-reuse-policy"
-	FlagCronSchedule                 = "cron"
-	FlagWorkflowType                 = "type"
-	FlagWorkflowTypeAlias            = []string{"t"}
-	FlagWorkflowExecutionTimeout     = "execution-timeout"
-	FlagWorkflowRunTimeout           = "run-timeout"
-	FlagWorkflowTaskTimeout          = "task-timeout"
-	FlagContextTimeout               = "context-timeout"
-	FlagInput                        = "input"
-	FlagInputAlias                   = []string{"i"}
-	FlagInputFile                    = "input-file"
-	FlagExcludeFile                  = "exclude-file"
-	FlagInputSeparator               = "input-separator"
-	FlagParallelism                  = "input-parallelism"
-	FlagSkipCurrentOpen              = "skip-current-open"
-	FlagSkipBaseIsNotCurrent         = "skip-base-is-not-current"
-	FlagDryRun                       = "dry-run"
-	FlagNonDeterministic             = "non-deterministic"
-	FlagCluster                      = "cluster"
-	FlagResult                       = "result"
-	FlagIdentity                     = "identity"
-	FlagDetail                       = "detail"
-	FlagReason                       = "reason"
-	FlagReasonAlias                  = []string{"r"}
-	FlagPageSize                     = "pagesize"
-	FlagPrintRaw                     = "raw"
-	FlagDescription                  = "description"
-	FlagDescriptionAlias             = []string{"d"}
-	FlagOwnerEmail                   = "owner-email"
-	FlagOwnerEmailAlias              = []string{"e"}
-	FlagRetention                    = "retention"
-	FlagRetentionAlias               = []string{"r"}
-	FlagHistoryArchivalState         = "history-archival-state"
-	FlagHistoryArchivalStateAlias    = []string{"has"}
-	FlagHistoryArchivalURI           = "history-uri"
-	FlagVisibilityArchivalState      = "visibility-archival-state"
-	FlagVisibilityArchivalStateAlias = []string{"vas"}
-	FlagVisibilityArchivalURI        = "visibility-uri"
-	FlagName                         = "name"
-	FlagOutputFilename               = "output-filename"
-	FlagQueryType                    = "query-type"
-	FlagQueryTypeAlias               = []string{"qt"}
-	FlagQueryRejectCondition         = "query-reject-condition"
-	FlagActiveClusterName            = "active-cluster"
-	FlagClusters                     = "clusters"
-	FlagIsGlobalNamespace            = "global-namespace"
-	FlagNamespaceData                = "namespace-data"
-	FlagPromoteNamespace             = "promote-namespace"
-	FlagEventID                      = "event-id"
-	FlagActivityID                   = "activity-id"
-	FlagActivityIDAlias              = []string{"aid"}
-	FlagMaxFieldLength               = "max-field-length"
-	FlagMemoKey                      = "memo-key"
-	FlagMemo                         = "memo"
-	FlagMemoFile                     = "memo-file"
-	FlagSearchAttributeKey           = "search-attribute-key"
-	FlagSearchAttributeValue         = "search-attribute-value"
-	FlagAddBadBinary                 = "add-bad-binary"
-	FlagRemoveBadBinary              = "remove-bad-binary"
-	FlagResetType                    = "reset-type"
-	FlagResetReapplyType             = "reset-reapply-type"
-	FlagResetPointsOnly              = "reset-points-only"
-	FlagResetBadBinaryChecksum       = "reset-bad-binary-checksum"
-	FlagListQuery                    = "query"
-	FlagListQueryAlias               = []string{"q"}
-	FlagListQueryUsage               = "Filter results using SQL like query. See https://docs.temporal.io/docs/tctl/workflow/list#--query for details"
-	FlagArchive                      = "archived"
-	FlagArchiveAlias                 = []string{"a"}
-	FlagBatchType                    = "batch-type"
-	FlagSignalName                   = "signal-name"
-	FlagRPS                          = "rps"
-	FlagJobID                        = "job-id"
-	FlagJobIDAlias                   = []string{"jid"}
-	FlagYes                          = "yes"
-	FlagYesAlias                     = []string{"y"}
-	FlagTLSCertPath                  = "tls-cert-path"
-	FlagTLSKeyPath                   = "tls-key-path"
-	FlagTLSCaPath                    = "tls-ca-path"
-	FlagTLSDisableHostVerification   = "tls-disable-host-verification"
-	FlagTLSServerName                = "tls-server-name"
-	FlagConcurrency                  = "concurrency"
-	FlagDataConverterPlugin          = "data-converter-plugin"
-	FlagCodecAuth                    = "codec-auth"
-	FlagCodecEndpoint                = "codec-endpoint"
-	FlagWebURL                       = "web-ui-url"
-	FlagHeadersProviderPlugin        = "headers-provider-plugin"
-	FlagPort                         = "port"
-	FlagFollowAlias                  = []string{"f"}
-	FlagType                         = "type"
-	FlagScheduleID                   = "schedule-id"
-	FlagScheduleIDAlias              = []string{"sid"}
-	FlagOverlapPolicy                = "overlap-policy"
-	FlagCalendar                     = "calendar"
-	FlagCalendarAlias                = []string{"cal"}
-	FlagInterval                     = "interval"
-	FlagStartTime                    = "start-time"
-	FlagEndTime                      = "end-time"
-	FlagJitter                       = "jitter"
-	FlagTimeZone                     = "time-zone"
-	FlagTimeZoneAlias                = []string{"tz"}
-	FlagInitialNotes                 = "initial-notes"
-	FlagInitialPaused                = "initial-paused"
-	FlagRemainingActions             = "remaining-actions"
-	FlagCatchupWindow                = "catchup-window"
-	FlagPauseOnFailure               = "pause-on-failure"
-	FlagPause                        = "pause"
-	FlagUnpause                      = "unpause"
-	FlagFold                         = "fold"
-	FlagNoFold                       = "no-fold"
-	FlagDepth                        = "depth"
+	FlagUsername                   = "username"
+	FlagPassword                   = "password"
+	FlagKeyspace                   = "keyspace"
+	FlagAddress                    = "address"
+	FlagAuth                       = "auth"
+	FlagNamespaceID                = "namespace-id"
+	FlagNamespace                  = "namespace"
+	FlagNamespaceAlias             = []string{"n"}
+	FlagWorkflowID                 = "workflow-id"
+	FlagWorkflowIDAlias            = []string{"w"}
+	FlagRunID                      = "run-id"
+	FlagRunIDAlias                 = []string{"r"}
+	FlagTaskQueue                  = "task-queue"
+	FlagTaskQueueAlias             = []string{"t"}
+	FlagTaskQueueType              = "task-queue-type"
+	FlagWorkflowIDReusePolicy      = "workflow-id-reuse-policy"
+	FlagCronSchedule               = "cron"
+	FlagWorkflowType               = "type"
+	FlagWorkflowExecutionTimeout   = "execution-timeout"
+	FlagWorkflowRunTimeout         = "run-timeout"
+	FlagWorkflowTaskTimeout        = "task-timeout"
+	FlagContextTimeout             = "context-timeout"
+	FlagInput                      = "input"
+	FlagInputAlias                 = []string{"i"}
+	FlagInputFile                  = "input-file"
+	FlagExcludeFile                = "exclude-file"
+	FlagInputSeparator             = "input-separator"
+	FlagParallelism                = "input-parallelism"
+	FlagSkipCurrentOpen            = "skip-current-open"
+	FlagSkipBaseIsNotCurrent       = "skip-base-is-not-current"
+	FlagDryRun                     = "dry-run"
+	FlagNonDeterministic           = "non-deterministic"
+	FlagCluster                    = "cluster"
+	FlagResult                     = "result"
+	FlagIdentity                   = "identity"
+	FlagDetail                     = "detail"
+	FlagReason                     = "reason"
+	FlagPageSize                   = "pagesize"
+	FlagPrintRaw                   = "raw"
+	FlagDescription                = "description"
+	FlagOwnerEmail                 = "owner-email"
+	FlagRetention                  = "retention"
+	FlagHistoryArchivalState       = "history-archival-state"
+	FlagHistoryArchivalURI         = "history-uri"
+	FlagVisibilityArchivalState    = "visibility-archival-state"
+	FlagVisibilityArchivalURI      = "visibility-uri"
+	FlagName                       = "name"
+	FlagOutputFilename             = "output-filename"
+	FlagQueryType                  = "query-type"
+	FlagQueryRejectCondition       = "query-reject-condition"
+	FlagActiveClusterName          = "active-cluster"
+	FlagClusters                   = "clusters"
+	FlagIsGlobalNamespace          = "global-namespace"
+	FlagNamespaceData              = "namespace-data"
+	FlagPromoteNamespace           = "promote-namespace"
+	FlagEventID                    = "event-id"
+	FlagActivityID                 = "activity-id"
+	FlagMaxFieldLength             = "max-field-length"
+	FlagMemoKey                    = "memo-key"
+	FlagMemo                       = "memo"
+	FlagMemoFile                   = "memo-file"
+	FlagSearchAttributeKey         = "search-attribute-key"
+	FlagSearchAttributeValue       = "search-attribute-value"
+	FlagAddBadBinary               = "add-bad-binary"
+	FlagRemoveBadBinary            = "remove-bad-binary"
+	FlagResetType                  = "reset-type"
+	FlagResetReapplyType           = "reset-reapply-type"
+	FlagResetPointsOnly            = "reset-points-only"
+	FlagResetBadBinaryChecksum     = "reset-bad-binary-checksum"
+	FlagListQuery                  = "query"
+	FlagListQueryAlias             = []string{"q"}
+	FlagListQueryUsage             = "Filter results using SQL like query. See https://docs.temporal.io/docs/tctl/workflow/list#--query for details"
+	FlagArchive                    = "archived"
+	FlagBatchType                  = "batch-type"
+	FlagSignalName                 = "signal-name"
+	FlagRPS                        = "rps"
+	FlagJobID                      = "job-id"
+	FlagYes                        = "yes"
+	FlagYesAlias                   = []string{"y"}
+	FlagTLSCertPath                = "tls-cert-path"
+	FlagTLSKeyPath                 = "tls-key-path"
+	FlagTLSCaPath                  = "tls-ca-path"
+	FlagTLSDisableHostVerification = "tls-disable-host-verification"
+	FlagTLSServerName              = "tls-server-name"
+	FlagConcurrency                = "concurrency"
+	FlagDataConverterPlugin        = "data-converter-plugin"
+	FlagCodecAuth                  = "codec-auth"
+	FlagCodecEndpoint              = "codec-endpoint"
+	FlagWebURL                     = "web-ui-url"
+	FlagHeadersProviderPlugin      = "headers-provider-plugin"
+	FlagPort                       = "port"
+	FlagFollowAlias                = []string{"f"}
+	FlagType                       = "type"
+	FlagScheduleID                 = "schedule-id"
+	FlagScheduleIDAlias            = []string{"s"}
+	FlagOverlapPolicy              = "overlap-policy"
+	FlagCalendar                   = "calendar"
+	FlagInterval                   = "interval"
+	FlagStartTime                  = "start-time"
+	FlagEndTime                    = "end-time"
+	FlagJitter                     = "jitter"
+	FlagTimeZone                   = "time-zone"
+	FlagInitialNotes               = "initial-notes"
+	FlagInitialPaused              = "initial-paused"
+	FlagRemainingActions           = "remaining-actions"
+	FlagCatchupWindow              = "catchup-window"
+	FlagPauseOnFailure             = "pause-on-failure"
+	FlagPause                      = "pause"
+	FlagUnpause                    = "unpause"
+	FlagFold                       = "fold"
+	FlagNoFold                     = "no-fold"
+	FlagDepth                      = "depth"
 
 	FlagProtoType  = "type"
 	FlagHexData    = "hex-data"
@@ -218,7 +204,6 @@ var flagsForStartWorkflow = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Name:     FlagWorkflowType,
-		Aliases:  FlagWorkflowTypeAlias,
 		Usage:    "Workflow type name",
 		Required: true,
 	},
@@ -295,17 +280,8 @@ var flagsForWorkflowFiltering = []cli.Flag{
 		Usage:   FlagListQueryUsage,
 	},
 	&cli.BoolFlag{
-		Name:    FlagArchive,
-		Aliases: FlagArchiveAlias,
-		Usage:   "List archived Workflow Executions (EXPERIMENTAL)",
-	},
-}
-
-var flagsForScan = []cli.Flag{
-	&cli.StringFlag{
-		Name:    FlagListQuery,
-		Aliases: FlagListQueryAlias,
-		Usage:   FlagListQueryUsage,
+		Name:  FlagArchive,
+		Usage: "List archived Workflow Executions (EXPERIMENTAL)",
 	},
 }
 

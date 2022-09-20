@@ -42,7 +42,6 @@ func newBatchCommands() []*cli.Command {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     FlagJobID,
-					Aliases:  FlagJobIDAlias,
 					Usage:    "Batch Job Id",
 					Required: true,
 				},
@@ -77,7 +76,6 @@ func newBatchCommands() []*cli.Command {
 				},
 				&cli.StringFlag{
 					Name:     FlagReason,
-					Aliases:  FlagReasonAlias,
 					Usage:    "Reason to run this batch job",
 					Required: true,
 				},
@@ -115,13 +113,11 @@ func newBatchCommands() []*cli.Command {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     FlagJobID,
-					Aliases:  FlagJobIDAlias,
 					Usage:    "Batch Job Id",
 					Required: true,
 				},
 				&cli.StringFlag{
 					Name:     FlagReason,
-					Aliases:  FlagReasonAlias,
 					Usage:    "Reason to stop this batch job",
 					Required: true,
 				},

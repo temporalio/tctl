@@ -88,7 +88,6 @@ func newWorkflowCommands() []*cli.Command {
 			Flags: append(flagsForStackTraceQuery,
 				&cli.StringFlag{
 					Name:     FlagQueryType,
-					Aliases:  FlagQueryTypeAlias,
 					Usage:    "The query type you want to run",
 					Required: true,
 				}),
@@ -149,9 +148,8 @@ func newWorkflowCommands() []*cli.Command {
 			Usage: "Terminate a Workflow Execution",
 			Flags: append(flagsForExecution, []cli.Flag{
 				&cli.StringFlag{
-					Name:    FlagReason,
-					Aliases: FlagReasonAlias,
-					Usage:   "Reason for terminating the Workflow Execution",
+					Name:  FlagReason,
+					Usage: "Reason for terminating the Workflow Execution",
 				},
 			}...),
 			Action: func(c *cli.Context) error {

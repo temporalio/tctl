@@ -31,19 +31,16 @@ import (
 var (
 	registerNamespaceFlags = []cli.Flag{
 		&cli.StringFlag{
-			Name:    FlagDescription,
-			Aliases: FlagDescriptionAlias,
-			Usage:   "Namespace description",
+			Name:  FlagDescription,
+			Usage: "Namespace description",
 		},
 		&cli.StringFlag{
-			Name:    FlagOwnerEmail,
-			Aliases: FlagOwnerEmailAlias,
-			Usage:   "Owner email",
+			Name:  FlagOwnerEmail,
+			Usage: "Owner email",
 		},
 		&cli.StringFlag{
-			Name:    FlagRetention,
-			Aliases: FlagRetentionAlias,
-			Usage:   "Workflow Execution retention",
+			Name:  FlagRetention,
+			Usage: "Workflow Execution retention",
 		},
 		&cli.StringFlag{
 			Name:  FlagActiveClusterName,
@@ -65,18 +62,16 @@ var (
 			Usage: "Namespace data of key value pairs, in format of k1:v1,k2:v2,k3:v3",
 		},
 		&cli.StringFlag{
-			Name:    FlagHistoryArchivalState,
-			Aliases: FlagHistoryArchivalStateAlias,
-			Usage:   "Flag to set history archival state, valid values are \"disabled\" and \"enabled\"",
+			Name:  FlagHistoryArchivalState,
+			Usage: "Flag to set history archival state, valid values are \"disabled\" and \"enabled\"",
 		},
 		&cli.StringFlag{
 			Name:  FlagHistoryArchivalURI,
 			Usage: "Optionally specify history archival URI (cannot be changed after first time archival is enabled)",
 		},
 		&cli.StringFlag{
-			Name:    FlagVisibilityArchivalState,
-			Aliases: FlagVisibilityArchivalStateAlias,
-			Usage:   "Flag to set visibility archival state, valid values are \"disabled\" and \"enabled\"",
+			Name:  FlagVisibilityArchivalState,
+			Usage: "Flag to set visibility archival state, valid values are \"disabled\" and \"enabled\"",
 		},
 		&cli.StringFlag{
 			Name:  FlagVisibilityArchivalURI,
@@ -86,19 +81,16 @@ var (
 
 	updateNamespaceFlags = []cli.Flag{
 		&cli.StringFlag{
-			Name:    FlagDescription,
-			Aliases: FlagDescriptionAlias,
-			Usage:   "Namespace description",
+			Name:  FlagDescription,
+			Usage: "Namespace description",
 		},
 		&cli.StringFlag{
-			Name:    FlagOwnerEmail,
-			Aliases: FlagOwnerEmailAlias,
-			Usage:   "Owner email",
+			Name:  FlagOwnerEmail,
+			Usage: "Owner email",
 		},
 		&cli.StringFlag{
-			Name:    FlagRetention,
-			Aliases: FlagRetentionAlias,
-			Usage:   "Workflow Execution retention",
+			Name:  FlagRetention,
+			Usage: "Workflow Execution retention",
 		},
 		&cli.StringFlag{
 			Name:  FlagActiveClusterName,
@@ -116,18 +108,16 @@ var (
 			Usage: "Namespace data of key value pairs, in format of k1:v1,k2:v2,k3:v3 ",
 		},
 		&cli.StringFlag{
-			Name:    FlagHistoryArchivalState,
-			Aliases: FlagHistoryArchivalStateAlias,
-			Usage:   "Flag to set history archival state, valid values are \"disabled\" and \"enabled\"",
+			Name:  FlagHistoryArchivalState,
+			Usage: "Flag to set history archival state, valid values are \"disabled\" and \"enabled\"",
 		},
 		&cli.StringFlag{
 			Name:  FlagHistoryArchivalURI,
 			Usage: "Optionally specify history archival URI (cannot be changed after first time archival is enabled)",
 		},
 		&cli.StringFlag{
-			Name:    FlagVisibilityArchivalState,
-			Aliases: FlagVisibilityArchivalStateAlias,
-			Usage:   "Flag to set visibility archival state, valid values are \"disabled\" and \"enabled\"",
+			Name:  FlagVisibilityArchivalState,
+			Usage: "Flag to set visibility archival state, valid values are \"disabled\" and \"enabled\"",
 		},
 		&cli.StringFlag{
 			Name:  FlagVisibilityArchivalURI,
