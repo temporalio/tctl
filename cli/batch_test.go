@@ -39,3 +39,17 @@ func (s *cliAppSuite) TestListBatchJobs() {
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
 }
+
+func (s *cliAppSuite) TestStopBatchJob() {
+	s.sdkClient.On("WorkflowService().StopWorkflowExecution", mock.Anything, mock.Anything).Return(&workflowservice.StopBatchOperationResponse{}, nil).Once()
+	err := s.app.Run([]string{"", "batch", "stop", "--job-id", "test", "--reason", "test"})
+	s.Nil(err)
+	s.sdkClient.AssertExpectations(s.T())
+}
+
+func (s *cliAppSuite) TestDescribeBatchJob() {
+	s.sdkClient.On("WorkflowService().DescribeBatchJob", mock.Anything, mock.Anything).Return(&workflowservice.DescribeBatchOperationResponse{}, nil).Once()
+	err := s.app.Run([]string{"", "batch", "describe", "--job-id", "test"})
+	s.Nil(err)
+	s.sdkClient.AssertExpectations(s.T())
+}
