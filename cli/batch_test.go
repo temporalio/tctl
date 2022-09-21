@@ -26,6 +26,7 @@ package cli
 
 import (
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/mock"
 	"go.temporal.io/api/workflowservice/v1"
 )
 
@@ -47,9 +48,33 @@ func (s *cliAppSuite) TestStopBatchJob() {
 	s.sdkClient.AssertExpectations(s.T())
 }
 
+func (s *cliAppSuite) TestStartBatchJob_Signal() {
+	s.sdkClient.On("CountWorkflow", mock.Anything, mock.Anything).Return(&workflowservice.CountWorkflowExecutionsResponse{Count: 5}, nil).Once()
+	s.sdkClient.On("StartBatchJob", mock.Anything, mock.Anything).Return(&workflowservice.StartBatchOperationResponse{}, nil).Once()
+	err := s.app.Run([]string{"", "batch", "start", "--type", "signal", "--query", "WorkflowType='test-type'", "--reason", "test-reason", "--signal-name", "test-signal", "--input", "test-input", "--yes"})
+	s.Nil(err)
+	s.sdkClient.AssertExpectations(s.T())
+}
+
 func (s *cliAppSuite) TestDescribeBatchJob() {
 	s.frontendClient.EXPECT().DescribeBatchOperation(gomock.Any(), gomock.Any()).Return(&workflowservice.DescribeBatchOperationResponse{}, nil).Times(1)
 	err := s.app.Run([]string{"", "batch", "describe", "--job-id", "test"})
+	s.Nil(err)
+	s.sdkClient.AssertExpectations(s.T())
+}
+
+func (s *cliAppSuite) TestStartBatchJob_Terminate() {
+	s.sdkClient.On("CountWorkflow", mock.Anything, mock.Anything).Return(&workflowservice.CountWorkflowExecutionsResponse{Count: 5}, nil).Once()
+	s.sdkClient.On("StartBatchJob", mock.Anything, mock.Anything).Return(&workflowservice.StartBatchOperationResponse{}, nil).Once()
+	err := s.app.Run([]string{"", "batch", "start", "--type", "terminate", "--query", "WorkflowType='test-type'", "--reason", "test-reason", "--yes"})
+	s.Nil(err)
+	s.sdkClient.AssertExpectations(s.T())
+}
+
+func (s *cliAppSuite) TestStartBatchJob_Cancel() {
+	s.sdkClient.On("CountWorkflow", mock.Anything, mock.Anything).Return(&workflowservice.CountWorkflowExecutionsResponse{Count: 5}, nil).Once()
+	s.sdkClient.On("StartBatchJob", mock.Anything, mock.Anything).Return(&workflowservice.StartBatchOperationResponse{}, nil).Once()
+	err := s.app.Run([]string{"", "batch", "start", "--type", "cancel", "--query", "WorkflowType='test-type'", "--reason", "test-reason", "--yes"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
 }
