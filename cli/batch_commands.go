@@ -112,10 +112,10 @@ func StartBatchJob(c *cli.Context) error {
 	batchType := c.String(FlagType)
 	operator := getCurrentUserFromEnv()
 
-	client := cFactory.SDKClient(c, primitives.SystemLocalNamespace)
+	sdk := cFactory.SDKClient(c, namespace)
 	tcCtx, cancel := newContext(c)
 	defer cancel()
-	cResp, err := client.CountWorkflow(tcCtx, &workflowservice.CountWorkflowExecutionsRequest{
+	cResp, err := sdk.CountWorkflow(tcCtx, &workflowservice.CountWorkflowExecutionsRequest{
 		Namespace: namespace,
 		Query:     query,
 	})
@@ -149,7 +149,7 @@ func StartBatchJob(c *cli.Context) error {
 
 	jobID := uuid.New().String()
 	req := workflowservice.StartBatchOperationRequest{
-		Namespace:       primitives.SystemLocalNamespace,
+		Namespace:       namespace,
 		Reason:          reason,
 		VisibilityQuery: query,
 		JobId:           jobID,
@@ -187,9 +187,10 @@ func StartBatchJob(c *cli.Context) error {
 		return fmt.Errorf("unknown batch type. Supported types: %s", strings.Join(allBatchTypes, ","))
 	}
 
+	client := cFactory.FrontendClient(c)
 	ctx, cancel := newContext(c)
 	defer cancel()
-	_, err = client.WorkflowService().StartBatchOperation(ctx, &req)
+	_, err = client.StartBatchOperation(ctx, &req)
 	if err != nil {
 		return fmt.Errorf("unable to start batch job: %s", err)
 	}
