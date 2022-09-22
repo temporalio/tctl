@@ -35,6 +35,7 @@ import (
 	"github.com/urfave/cli/v2"
 	enumspb "go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/operatorservice/v1"
+	"go.temporal.io/api/workflowservice/v1"
 )
 
 const (
@@ -161,5 +162,35 @@ func RemoveSearchAttributes(c *cli.Context) error {
 		return fmt.Errorf("unable to remove search attributes: %v", err)
 	}
 	fmt.Println(color.Green(c, "Search attributes have been removed"))
+	return nil
+}
+
+func Describe(c *cli.Context) error {
+	client, err := getSDKClient(c)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := newContext(c)
+	defer cancel()
+
+	system, err := client.WorkflowService().GetSystemInfo(ctx, &workflowservice.GetSystemInfoRequest{})
+	if err != nil {
+		return fmt.Errorf("unable to get system information: %s", err)
+	}
+
+	po := &output.PrintOptions{
+		Fields: []string{"ServerVersion", "Capabilities.SupportsSchedules", "Capabilities.UpsertMemo"},
+	}
+	output.PrintItems(c, []interface{}{system}, po)
+
+	cluster, err := client.WorkflowService().GetClusterInfo(ctx, &workflowservice.GetClusterInfoRequest{})
+	if err != nil {
+		return fmt.Errorf("unable to get cluster information: %s", err)
+	}
+
+	po = &output.PrintOptions{
+		Fields: []string{"PersistenceStore", "VisibilityStore", "HistoryShardCount"},
+	}
+	output.PrintItems(c, []interface{}{cluster}, po)
 	return nil
 }

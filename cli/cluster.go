@@ -42,6 +42,22 @@ func newClusterCommands() []*cli.Command {
 			},
 		},
 		{
+			Name:      "describe",
+			Usage:     "Show information about the cluster",
+			ArgsUsage: " ",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    output.FlagOutput,
+					Aliases: []string{"o"},
+					Usage:   output.UsageText,
+					Value:   string(output.Table),
+				},
+			},
+			Action: func(c *cli.Context) error {
+				return Describe(c)
+			},
+		},
+		{
 			Name:  "add-search-attributes",
 			Usage: "Add custom search attributes",
 			Flags: []cli.Flag{
