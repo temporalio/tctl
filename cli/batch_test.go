@@ -41,14 +41,14 @@ func (s *cliAppSuite) TestListBatchJobs() {
 }
 
 func (s *cliAppSuite) TestStopBatchJob() {
-	s.sdkClient.On("WorkflowService().StopWorkflowExecution", mock.Anything, mock.Anything).Return(&workflowservice.StopBatchOperationResponse{}, nil).Once()
+	s.frontendClient.EXPECT().StopBatchOperation(gomock.Any(), gomock.Any()).Return(&workflowservice.StopBatchOperationResponse{}, nil).Times(1)
 	err := s.app.Run([]string{"", "batch", "stop", "--job-id", "test", "--reason", "test"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
 }
 
 func (s *cliAppSuite) TestDescribeBatchJob() {
-	s.sdkClient.On("WorkflowService().DescribeBatchJob", mock.Anything, mock.Anything).Return(&workflowservice.DescribeBatchOperationResponse{}, nil).Once()
+	s.frontendClient.EXPECT().DescribeBatchOperation(gomock.Any(), gomock.Any()).Return(&workflowservice.DescribeBatchOperationResponse{}, nil).Times(1)
 	err := s.app.Run([]string{"", "batch", "describe", "--job-id", "test"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())

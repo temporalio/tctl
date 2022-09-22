@@ -47,10 +47,10 @@ import (
 func DescribeBatchJob(c *cli.Context) error {
 	jobID := c.String(FlagJobID)
 
-	client := cFactory.SDKClient(c, primitives.SystemLocalNamespace)
+	client := cFactory.FrontendClient(c)
 	ctx, cancel := newContext(c)
 	defer cancel()
-	resp, err := client.WorkflowService().DescribeBatchOperation(ctx, &workflowservice.DescribeBatchOperationRequest{
+	resp, err := client.DescribeBatchOperation(ctx, &workflowservice.DescribeBatchOperationRequest{
 		Namespace: primitives.SystemLocalNamespace,
 		JobId:     jobID,
 	})
@@ -201,11 +201,11 @@ func StartBatchJob(c *cli.Context) error {
 func StopBatchJob(c *cli.Context) error {
 	jobID := c.String(FlagJobID)
 	reason := c.String(FlagReason)
-	client := cFactory.SDKClient(c, primitives.SystemLocalNamespace)
+	client := cFactory.FrontendClient(c)
 
 	ctx, cancel := newContext(c)
 	defer cancel()
-	_, err := client.WorkflowService().StopBatchOperation(ctx, &workflowservice.StopBatchOperationRequest{
+	_, err := client.StopBatchOperation(ctx, &workflowservice.StopBatchOperationRequest{
 		Namespace: primitives.SystemLocalNamespace,
 		JobId:     jobID,
 		Reason:    reason,
