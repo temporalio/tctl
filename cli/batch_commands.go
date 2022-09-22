@@ -81,7 +81,7 @@ func DescribeBatchJob(c *cli.Context) error {
 
 // ListBatchJobs list the started batch jobs
 func ListBatchJobs(c *cli.Context) error {
-	client := cFactory.SDKClient(c, primitives.SystemLocalNamespace)
+	client := cFactory.FrontendClient(c)
 
 	paginationFunc := func(npt []byte) ([]interface{}, []byte, error) {
 		var items []interface{}
@@ -89,7 +89,7 @@ func ListBatchJobs(c *cli.Context) error {
 
 		ctx, cancel := newContext(c)
 		defer cancel()
-		resp, err := client.WorkflowService().ListBatchOperations(ctx, &workflowservice.ListBatchOperationsRequest{
+		resp, err := client.ListBatchOperations(ctx, &workflowservice.ListBatchOperationsRequest{
 			Namespace: primitives.SystemLocalNamespace,
 		})
 

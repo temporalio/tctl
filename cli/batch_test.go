@@ -25,17 +25,16 @@
 package cli
 
 import (
-	"github.com/stretchr/testify/mock"
+	"github.com/golang/mock/gomock"
 	"go.temporal.io/api/workflowservice/v1"
 )
 
 func (s *cliAppSuite) TestListBatchJobs() {
-	s.sdkClient.On("WorkflowService().ListBatchOperations", mock.Anything).Return(&workflowservice.ListBatchOperationsResponse{}, nil).Once()
+	s.frontendClient.EXPECT().ListBatchOperations(gomock.Any(), gomock.Any()).Return(&workflowservice.ListBatchOperationsResponse{}, nil).Times(2)
 	err := s.app.Run([]string{"", "batch", "list"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
 
-	s.sdkClient.On("WorkflowService().ListBatchOperations", mock.Anything).Return(&workflowservice.ListBatchOperationsResponse{}, nil).Once()
 	err = s.app.Run([]string{"", "batch", "list", "--fields", "long"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
