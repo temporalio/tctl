@@ -48,6 +48,17 @@ func SetFactory(factory ClientFactory) {
 
 // NewCliApp instantiates a new instance of the CLI application.
 func NewCliApp() *cli.App {
+	cli.HelpFlag = &cli.BoolFlag{
+		Name:    "help",
+		Aliases: []string{"h"},
+		Usage:   "Show help",
+	}
+	cli.VersionFlag = &cli.BoolFlag{
+		Name:    "version",
+		Aliases: []string{"v"},
+		Usage:   "Print the version",
+	}
+
 	app := cli.NewApp()
 	app.Name = "tctl"
 	app.Usage = "A command-line tool for Temporal users"
