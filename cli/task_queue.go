@@ -35,7 +35,7 @@ func newTaskQueueCommands() []*cli.Command {
 		{
 			Name:  "describe",
 			Usage: "Describe the Workers polling on this Task Queue",
-			Description: `The Server records the last time of each poll request. Poll requests can last up to a minute, so a LastAccessTime under a minute is normal. If it's over a minute, then either the Worker is at capacity (all Worfklow and Activity slots are full) or it has shut down. Once it has been 5 minutes since the last poll request, the Worker is removed from the list.
+			Description: `The Server records the last time of each poll request. Poll requests can last up to a minute, so a LastAccessTime under a minute is normal. If it's over a minute, then likely either the Worker is at capacity (all Worfklow and Activity slots are full) or it has shut down. Once it has been 5 minutes since the last poll request, the Worker is removed from the list.
 
 RatePerSecond is the maximum Activities per second the Worker will execute.`,
 			Flags: append([]cli.Flag{
