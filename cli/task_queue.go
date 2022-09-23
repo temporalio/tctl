@@ -57,7 +57,7 @@ RatePerSecond is the maximum Activities per second the Worker will execute.`,
 		},
 		{
 			Name:  "list-partition",
-			Usage: "List the Task Queue's partitions and their hostnames",
+			Usage: "List the Task Queue's partitions and which matching node they are assigned to",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     FlagTaskQueue,
