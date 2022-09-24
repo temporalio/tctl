@@ -107,7 +107,7 @@ func StartBatchJob(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	query := c.String(FlagListQuery)
+	query := c.String(FlagQuery)
 	reason := c.String(FlagReason)
 	batchType := c.String(FlagType)
 	operator := getCurrentUserFromEnv()
@@ -159,8 +159,8 @@ func StartBatchJob(c *cli.Context) error {
 	case batcher.BatchTypeSignal:
 		sigName := c.String(FlagSignalName)
 
-		if sigName == "" || input == "" {
-			return fmt.Errorf("options %s and %s are required for type %s", FlagSignalName, FlagInput, batcher.BatchTypeSignal)
+		if sigName == "" {
+			return fmt.Errorf("option %s are required for type %s", FlagSignalName, batcher.BatchTypeSignal)
 		}
 
 		req.Operation = &workflowservice.StartBatchOperationRequest_SignalOperation{
@@ -173,7 +173,6 @@ func StartBatchJob(c *cli.Context) error {
 	case batcher.BatchTypeTerminate:
 		req.Operation = &workflowservice.StartBatchOperationRequest_TerminationOperation{
 			TerminationOperation: &batch.BatchOperationTermination{
-				Details:  payloads,
 				Identity: operator,
 			},
 		}

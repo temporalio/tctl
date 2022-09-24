@@ -65,8 +65,8 @@ func newBatchCommands() []*cli.Command {
 			Usage: "Start a batch operation job",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name:     FlagListQuery,
-					Aliases:  FlagListQueryAlias,
+					Name:     FlagQuery,
+					Aliases:  FlagQueryAlias,
 					Usage:    "Specify the Workflow Executions to operate on",
 					Required: true,
 				},
