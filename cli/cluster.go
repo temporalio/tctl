@@ -45,7 +45,7 @@ func newClusterCommands() []*cli.Command {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:    output.FlagOutput,
-					Aliases: []string{"o"},
+					Aliases: FlagOutputAlias,
 					Usage:   output.UsageText,
 					Value:   string(output.Table),
 				},
