@@ -25,9 +25,7 @@
 package cli
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/pborman/uuid"
@@ -123,22 +121,12 @@ func StartBatchJob(c *cli.Context) error {
 		return fmt.Errorf("unable to count impacted workflows: %v", err)
 	}
 
-	fmt.Printf("This batch job will be operating on %v workflows.\n", cResp.GetCount())
-	if !c.Bool(FlagYes) {
-		reader := bufio.NewReader(os.Stdin)
-		for {
-			fmt.Print("Please confirm[Yes/No]:")
-			text, err := reader.ReadString('\n')
-			if err != nil {
-				return fmt.Errorf("unable to get confirmation to start a batch job: %s", err)
-			}
-			if strings.EqualFold(strings.TrimSpace(text), "yes") {
-				break
-			} else {
-				fmt.Println("Batch job is not started")
-				return nil
-			}
-		}
+	promptMsg := fmt.Sprintf(
+		"Will start a batch job operating on %v Workflow Executions. Continue? Y/N",
+		color.Yellow(c, "%v", cResp.GetCount()),
+	)
+	if !promptYes(promptMsg, c.Bool(FlagYes)) {
+		return nil
 	}
 
 	input := c.String(FlagInput)
