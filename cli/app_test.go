@@ -128,25 +128,25 @@ func (s *cliAppSuite) TestAppCommands() {
 
 func (s *cliAppSuite) TestNamespaceRegister_LocalNamespace() {
 	s.frontendClient.EXPECT().RegisterNamespace(gomock.Any(), gomock.Any()).Return(nil, nil)
-	err := s.app.Run([]string{"", "namespace", "register", "--global-namespace", "false", cliTestNamespace})
+	err := s.app.Run([]string{"", "namespace", "register", "--global", "false", cliTestNamespace})
 	s.NoError(err)
 }
 
 func (s *cliAppSuite) TestNamespaceRegister_GlobalNamespace() {
 	s.frontendClient.EXPECT().RegisterNamespace(gomock.Any(), gomock.Any()).Return(nil, nil)
-	err := s.app.Run([]string{"", "namespace", "register", "--global-namespace", "true", cliTestNamespace})
+	err := s.app.Run([]string{"", "namespace", "register", "--global", "true", cliTestNamespace})
 	s.NoError(err)
 }
 
 func (s *cliAppSuite) TestNamespaceRegister_NamespaceExist() {
 	s.frontendClient.EXPECT().RegisterNamespace(gomock.Any(), gomock.Any()).Return(nil, serviceerror.NewNamespaceAlreadyExists(""))
-	errorCode := s.RunWithExitCode([]string{"", "namespace", "register", "--global-namespace", "true", cliTestNamespace})
+	errorCode := s.RunWithExitCode([]string{"", "namespace", "register", "--global", "true", cliTestNamespace})
 	s.Equal(1, errorCode)
 }
 
 func (s *cliAppSuite) TestNamespaceRegister_Failed() {
 	s.frontendClient.EXPECT().RegisterNamespace(gomock.Any(), gomock.Any()).Return(nil, serviceerror.NewInvalidArgument("faked error"))
-	errorCode := s.RunWithExitCode([]string{"", "namespace", "register", "--global-namespace", "true", cliTestNamespace})
+	errorCode := s.RunWithExitCode([]string{"", "namespace", "register", "--global", "true", cliTestNamespace})
 	s.Equal(1, errorCode)
 }
 
@@ -178,7 +178,7 @@ func (s *cliAppSuite) TestNamespaceUpdate() {
 	s.frontendClient.EXPECT().UpdateNamespace(gomock.Any(), gomock.Any()).Return(nil, nil).Times(2)
 	err := s.app.Run([]string{"", "namespace", "update", cliTestNamespace})
 	s.Nil(err)
-	err = s.app.Run([]string{"", "namespace", "update", "--description", "another desc", "--owner-email", "another@uber.com", "--retention", "1", cliTestNamespace})
+	err = s.app.Run([]string{"", "namespace", "update", "--description", "another desc", "--email", "another@uber.com", "--retention", "1", cliTestNamespace})
 	s.Nil(err)
 }
 
@@ -365,13 +365,13 @@ func (s *cliAppSuite) TestCancelWorkflow_Failed() {
 
 func (s *cliAppSuite) TestSignalWorkflow() {
 	s.frontendClient.EXPECT().SignalWorkflowExecution(gomock.Any(), gomock.Any()).Return(nil, nil)
-	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "signal", "--workflow-id", "wid", "--name", "signal-name"})
+	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "signal", "--name", "signal-name", "--workflow-id", "wid"})
 	s.Nil(err)
 }
 
 func (s *cliAppSuite) TestSignalWorkflow_Failed() {
 	s.frontendClient.EXPECT().SignalWorkflowExecution(gomock.Any(), gomock.Any()).Return(nil, serviceerror.NewInvalidArgument("faked error"))
-	errorCode := s.RunWithExitCode([]string{"", "--namespace", cliTestNamespace, "workflow", "signal", "--workflow-id", "wid", "--name", "signal-name"})
+	errorCode := s.RunWithExitCode([]string{"", "--namespace", cliTestNamespace, "workflow", "signal", "--name", "signal-name", "--workflow-id", "wid"})
 	s.Equal(1, errorCode)
 }
 
