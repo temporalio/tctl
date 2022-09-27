@@ -120,7 +120,7 @@ func StartBatchJob(c *cli.Context) error {
 		Query:     query,
 	})
 	if err != nil {
-		return fmt.Errorf("unable to count impacted workflows: %s", err)
+		return fmt.Errorf("unable to count impacted workflows: %v", err)
 	}
 
 	fmt.Printf("This batch job will be operating on %v workflows.\n", cResp.GetCount())
