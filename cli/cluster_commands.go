@@ -70,7 +70,7 @@ func DescribeSystem(c *cli.Context) error {
 
 	system, err := client.GetSystemInfo(ctx, &workflowservice.GetSystemInfoRequest{})
 	if err != nil {
-		return fmt.Errorf("unable to get system information: %s", err)
+		return fmt.Errorf("unable to get system information: %v", err)
 	}
 
 	po := &output.PrintOptions{
