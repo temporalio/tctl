@@ -30,7 +30,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/google/uuid"
+	"github.com/pborman/uuid"
 	"github.com/temporalio/tctl-kit/pkg/color"
 	"github.com/temporalio/tctl-kit/pkg/output"
 	"github.com/temporalio/tctl-kit/pkg/pager"
@@ -147,7 +147,7 @@ func StartBatchJob(c *cli.Context) error {
 		return fmt.Errorf("failed to serialize signal value: %w", err)
 	}
 
-	jobID := uuid.New().String()
+	jobID := uuid.New()
 	req := workflowservice.StartBatchOperationRequest{
 		Namespace:       namespace,
 		Reason:          reason,
