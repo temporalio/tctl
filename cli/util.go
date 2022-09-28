@@ -28,6 +28,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -787,7 +788,7 @@ func ParseKeyValuePairs(kvs []string) (map[string]string, error) {
 		value := strings.TrimSpace(parts[1])
 
 		if key == "" {
-			return nil, fmt.Errorf("empty key is not allowed")
+			return nil, errors.New("empty key is not allowed")
 		}
 
 		pairs[key] = value
