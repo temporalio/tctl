@@ -163,7 +163,7 @@ func startBatchJob(c *cli.Context, req *workflowservice.StartBatchOperationReque
 	if err != nil {
 		return err
 	}
-	query := c.String(FlagQuery)
+	query := c.String(FlagFilter)
 	reason := c.String(FlagReason)
 
 	sdk := cFactory.SDKClient(c, namespace)

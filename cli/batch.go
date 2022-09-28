@@ -59,9 +59,8 @@ func newBatchCommands() []*cli.Command {
 			Usage: "Signal a batch of Workflow Executions",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name:     FlagQuery,
-					Aliases:  FlagQueryAlias,
-					Usage:    "Specify the Workflow Executions to operate on. See https://docs.temporal.io/docs/tctl/workflow/list#--query for details",
+					Name:     FlagFilter,
+					Usage:    "Specify the Workflow Executions to operate on. See https://docs.temporal.io/docs/tctl/workflow/list#--filter for details",
 					Required: true,
 				},
 				&cli.StringFlag{
@@ -94,9 +93,8 @@ func newBatchCommands() []*cli.Command {
 			Usage: "Terminate a batch of Workflow Executions",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name:     FlagQuery,
-					Aliases:  FlagQueryAlias,
-					Usage:    "Specify the Workflow Executions to operate on. See https://docs.temporal.io/docs/tctl/workflow/list#--query for details",
+					Name:     FlagFilter,
+					Usage:    "Specify the Workflow Executions to operate on. See https://docs.temporal.io/docs/tctl/workflow/list#--filter for details",
 					Required: true,
 				},
 				&cli.StringFlag{
@@ -119,9 +117,8 @@ func newBatchCommands() []*cli.Command {
 			Usage: "Cancel a batch of Workflow Executions",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name:     FlagQuery,
-					Aliases:  FlagQueryAlias,
-					Usage:    "Specify the Workflow Executions to operate on. See https://docs.temporal.io/docs/tctl/workflow/list#--query for details",
+					Name:     FlagFilter,
+					Usage:    "Specify the Workflow Executions to operate on. See https://docs.temporal.io/docs/tctl/workflow/list#--filter for details",
 					Required: true,
 				},
 				&cli.StringFlag{

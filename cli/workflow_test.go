@@ -238,14 +238,14 @@ func (s *cliAppSuite) TestListWorkflow_DeadlineExceeded() {
 
 func (s *cliAppSuite) TestListWorkflow_Open_WithQuery() {
 	s.sdkClient.On("ListWorkflow", mock.Anything, mock.Anything).Return(listWorkflowExecutionsResponse, nil).Once()
-	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "list", "--query", "ExecutionStatus='Running'"})
+	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "list", "--filter", "ExecutionStatus='Running'"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
 }
 
 func (s *cliAppSuite) TestListArchivedWorkflow() {
 	s.sdkClient.On("ListArchivedWorkflow", mock.Anything, mock.Anything).Return(&workflowservice.ListArchivedWorkflowExecutionsResponse{}, nil).Once()
-	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "list", "--archived", "--query", "some query string"})
+	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "list", "--archived", "--filter", "some query string"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
 }
@@ -257,7 +257,7 @@ func (s *cliAppSuite) TestCountWorkflow() {
 	s.sdkClient.AssertExpectations(s.T())
 
 	s.sdkClient.On("CountWorkflow", mock.Anything, mock.Anything).Return(&workflowservice.CountWorkflowExecutionsResponse{}, nil).Once()
-	err = s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "count", "--query", "'CloseTime = missing'"})
+	err = s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "count", "--filter", "'CloseTime = missing'"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
 }
@@ -265,7 +265,7 @@ func (s *cliAppSuite) TestCountWorkflow() {
 func (s *cliAppSuite) TestCountWorkflowDeadlineExceeded() {
 	s.sdkClient.On("CountWorkflow", mock.Anything, mock.Anything).Return(nil, context.DeadlineExceeded).Once()
 	s.sdkClient.On("CountWorkflow", mock.Anything, mock.Anything).Return(&workflowservice.CountWorkflowExecutionsResponse{}, nil).Once()
-	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "count", "--query", "'CloseTime = missing'"})
+	err := s.app.Run([]string{"", "--namespace", cliTestNamespace, "workflow", "count", "--filter", "'CloseTime = missing'"})
 	s.Nil(err)
 	s.sdkClient.AssertExpectations(s.T())
 }
