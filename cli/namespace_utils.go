@@ -46,10 +46,7 @@ var (
 			Name:  FlagActiveClusterName,
 			Usage: "Active cluster name",
 		},
-		&cli.StringFlag{
-			// use StringFlag instead of buggy StringSliceFlag
-			// TODO when https://github.com/urfave/cli/pull/392 & v2 is released
-			//  consider update urfave/cli
+		&cli.StringSliceFlag{
 			Name:  FlagCluster,
 			Usage: "Clusters",
 		},
@@ -57,7 +54,7 @@ var (
 			Name:  FlagIsGlobalNamespace,
 			Usage: "Flag to indicate whether namespace is a global namespace",
 		},
-		&cli.StringFlag{
+		&cli.StringSliceFlag{
 			Name:  FlagNamespaceData,
 			Usage: "Namespace data of key value pairs, in format of k1:v1,k2:v2,k3:v3",
 		},
@@ -97,13 +94,10 @@ var (
 			Usage: "Active cluster name",
 		},
 		&cli.StringFlag{
-			// use StringFlag instead of buggy StringSliceFlag
-			// TODO when https://github.com/urfave/cli/pull/392 & v2 is released
-			//  consider update urfave/cli
 			Name:  FlagCluster,
 			Usage: "Clusters",
 		},
-		&cli.StringFlag{
+		&cli.StringSliceFlag{
 			Name:  FlagNamespaceData,
 			Usage: "Namespace data of key value pairs, in format of k1:v1,k2:v2,k3:v3 ",
 		},

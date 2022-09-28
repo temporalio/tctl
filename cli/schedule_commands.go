@@ -25,7 +25,6 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -79,7 +78,7 @@ func buildIntervalSpec(s string) (*schedpb.IntervalSpec, error) {
 	var err error
 	parts := strings.Split(s, "/")
 	if len(parts) > 2 {
-		return nil, errors.New("Invalid interval string")
+		return nil, fmt.Errorf("invalid --%s string", FlagInterval)
 	} else if len(parts) == 2 {
 		if phase, err = timestamp.ParseDuration(parts[1]); err != nil {
 			return nil, err
@@ -312,9 +311,9 @@ func ToggleSchedule(c *cli.Context) error {
 
 	pause, unpause := c.Bool(FlagPause), c.Bool(FlagUnpause)
 	if pause && unpause {
-		return errors.New("Cannot specify both --pause and --unpause")
+		return fmt.Errorf("specify either --%s or --%s", FlagPause, FlagUnpause)
 	} else if !pause && !unpause {
-		return errors.New("Must specify one of --pause and --unpause")
+		return fmt.Errorf("specify either --%s or --%s", FlagPause, FlagUnpause)
 	}
 	patch := &schedpb.SchedulePatch{}
 	if pause {

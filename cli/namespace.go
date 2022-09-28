@@ -40,23 +40,21 @@ func SetRequiredNamespaceDataKeys(keys []string) {
 }
 
 func checkRequiredNamespaceDataKVs(namespaceData map[string]string) error {
-	// check requiredNamespaceDataKeys
 	for _, k := range requiredNamespaceDataKeys {
 		_, ok := namespaceData[k]
 		if !ok {
-			return fmt.Errorf("namespace data error, missing required key %v . All required keys: %v", k, requiredNamespaceDataKeys)
+			return fmt.Errorf("missing namespace data key %v. Required keys: %v", k, requiredNamespaceDataKeys)
 		}
 	}
 	return nil
 }
 
-func parseNamespaceDataKVs(namespaceDataStr string) (map[string]string, error) {
-	kvstrs := strings.Split(namespaceDataStr, ",")
+func parseNamespaceDataKVs(kvstrs []string) (map[string]string, error) {
 	kvMap := map[string]string{}
 	for _, kvstr := range kvstrs {
 		kv := strings.Split(kvstr, ":")
 		if len(kv) != 2 {
-			return kvMap, fmt.Errorf("namespace data format error. It must be k1:v2,k2:v2,...,kn:vn")
+			return kvMap, fmt.Errorf("unable to parse %s. Expected format: --%s k1:v1 --%s k2:v2", FlagNamespaceData, FlagNamespaceData, FlagNamespaceData)
 		}
 		k := strings.TrimSpace(kv[0])
 		v := strings.TrimSpace(kv[1])

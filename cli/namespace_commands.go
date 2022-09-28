@@ -69,16 +69,16 @@ func RegisterNamespace(c *cli.Context) error {
 		}
 	}
 
-	namespaceData := map[string]string{}
+	data := map[string]string{}
 	if c.IsSet(FlagNamespaceData) {
-		namespaceDataStr := c.String(FlagNamespaceData)
-		namespaceData, err = parseNamespaceDataKVs(namespaceDataStr)
+		datas := c.StringSlice(FlagNamespaceData)
+		data, err = parseNamespaceDataKVs(datas)
 		if err != nil {
 			return fmt.Errorf("option %s format is invalid: %w", FlagNamespaceData, err)
 		}
 	}
 	if len(requiredNamespaceDataKeys) > 0 {
-		err = checkRequiredNamespaceDataKVs(namespaceData)
+		err = checkRequiredNamespaceDataKVs(data)
 		if err != nil {
 			return fmt.Errorf("namespace data missed required data: %w", err)
 		}
@@ -91,13 +91,10 @@ func RegisterNamespace(c *cli.Context) error {
 
 	var clusters []*replicationpb.ClusterReplicationConfig
 	if c.IsSet(FlagCluster) {
-		clusterStr := c.String(FlagCluster)
-		clusters = append(clusters, &replicationpb.ClusterReplicationConfig{
-			ClusterName: clusterStr,
-		})
-		for _, clusterStr := range c.Args().Slice()[1:] { // First element is namespace name.
+		clusterNames := c.StringSlice(FlagCluster)
+		for _, clusterName := range clusterNames {
 			clusters = append(clusters, &replicationpb.ClusterReplicationConfig{
-				ClusterName: clusterStr,
+				ClusterName: clusterName,
 			})
 		}
 	}
@@ -115,7 +112,7 @@ func RegisterNamespace(c *cli.Context) error {
 		Namespace:                        ns,
 		Description:                      description,
 		OwnerEmail:                       ownerEmail,
-		Data:                             namespaceData,
+		Data:                             data,
 		WorkflowExecutionRetentionPeriod: &retention,
 		Clusters:                         clusters,
 		ActiveClusterName:                activeClusterName,
@@ -188,7 +185,6 @@ func UpdateNamespace(c *cli.Context) error {
 		description := resp.NamespaceInfo.GetDescription()
 		ownerEmail := resp.NamespaceInfo.GetOwnerEmail()
 		retention := timestamp.DurationValue(resp.Config.GetWorkflowExecutionRetentionTtl())
-		var clusters []*replicationpb.ClusterReplicationConfig
 
 		if c.IsSet(FlagDescription) {
 			description = c.String(FlagDescription)
@@ -198,7 +194,7 @@ func UpdateNamespace(c *cli.Context) error {
 		}
 		namespaceData := map[string]string{}
 		if c.IsSet(FlagNamespaceData) {
-			namespaceDataStr := c.String(FlagNamespaceData)
+			namespaceDataStr := c.StringSlice(FlagNamespaceData)
 			namespaceData, err = parseNamespaceDataKVs(namespaceDataStr)
 			if err != nil {
 				return fmt.Errorf("namespace data format is invalid: %w", err)
@@ -210,14 +206,13 @@ func UpdateNamespace(c *cli.Context) error {
 				return fmt.Errorf("option %s format is invalid: %w", FlagRetention, err)
 			}
 		}
+
+		var clusters []*replicationpb.ClusterReplicationConfig
 		if c.IsSet(FlagCluster) {
-			clusterStr := c.String(FlagCluster)
-			clusters = append(clusters, &replicationpb.ClusterReplicationConfig{
-				ClusterName: clusterStr,
-			})
-			for _, clusterStr := range c.Args().Slice()[1:] { // First element is namespace name.
+			clusterNames := c.StringSlice(FlagCluster)
+			for _, clusterName := range clusterNames {
 				clusters = append(clusters, &replicationpb.ClusterReplicationConfig{
-					ClusterName: clusterStr,
+					ClusterName: clusterName,
 				})
 			}
 		}
