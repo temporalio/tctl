@@ -67,6 +67,6 @@ func (s *cliAppSuite) TestListCluster() {
 
 func (s *cliAppSuite) TestRemoveCluster() {
 	s.operatorClient.EXPECT().RemoveRemoteCluster(gomock.Any(), gomock.Any()).Return(&operatorservice.RemoveRemoteClusterResponse{}, nil).Times(1)
-	err := s.app.Run([]string{"", "cluster", "remove"})
+	err := s.app.Run([]string{"", "cluster", "remove", "--name", "test"})
 	s.NoError(err)
 }
