@@ -22,7 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package cli
+package cli_curr
 
 import (
 	"errors"
@@ -30,21 +30,20 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
+	"github.com/gogo/protobuf/jsonpb"
+	"github.com/pborman/uuid"
+	"github.com/temporalio/tctl-kit/pkg/output"
+	"github.com/temporalio/tctl-kit/pkg/pager"
+	"github.com/urfave/cli"
 	"go.temporal.io/api/common/v1"
 	enumspb "go.temporal.io/api/enums/v1"
 	schedpb "go.temporal.io/api/schedule/v1"
 	"go.temporal.io/api/taskqueue/v1"
 	workflowpb "go.temporal.io/api/workflow/v1"
+	"go.temporal.io/api/workflowservice/v1"
 	"go.temporal.io/server/common/collection"
 	"go.temporal.io/server/common/primitives/timestamp"
-
-	"github.com/gogo/protobuf/jsonpb"
-	"github.com/pborman/uuid"
-	"github.com/temporalio/tctl-kit/pkg/color"
-	"github.com/temporalio/tctl-kit/pkg/output"
-	"github.com/temporalio/tctl-kit/pkg/pager"
-	"github.com/urfave/cli/v2"
-	"go.temporal.io/api/workflowservice/v1"
 )
 
 func scheduleBaseArgs(c *cli.Context) (
@@ -54,14 +53,8 @@ func scheduleBaseArgs(c *cli.Context) (
 	err error,
 ) {
 	frontendClient = cFactory.FrontendClient(c)
-	namespace, err = requiredFlag(c, FlagNamespace)
-	if err != nil {
-		return nil, "", "", err
-	}
-	scheduleID, err = requiredFlag(c, FlagScheduleID)
-	if err != nil {
-		return nil, "", "", err
-	}
+	namespace = getRequiredGlobalOption(c, FlagNamespace)
+	scheduleID = c.String(FlagScheduleID)
 	return frontendClient, namespace, scheduleID, nil
 }
 
@@ -79,7 +72,7 @@ func buildIntervalSpec(s string) (*schedpb.IntervalSpec, error) {
 	var err error
 	parts := strings.Split(s, "/")
 	if len(parts) > 2 {
-		return nil, errors.New("Invalid interval string")
+		return nil, errors.New("invalid interval string")
 	} else if len(parts) == 2 {
 		if phase, err = timestamp.ParseDuration(parts[1]); err != nil {
 			return nil, err
@@ -111,17 +104,11 @@ func buildScheduleSpec(c *cli.Context) (*schedpb.ScheduleSpec, error) {
 		out.Interval = append(out.Interval, cal)
 	}
 	if c.IsSet(FlagStartTime) {
-		t, err := parseTime(c.String(FlagStartTime), time.Time{}, now)
-		if err != nil {
-			return nil, err
-		}
+		t := parseTime(c.String(FlagStartTime), time.Time{}, now)
 		out.StartTime = timestamp.TimePtr(t)
 	}
 	if c.IsSet(FlagEndTime) {
-		t, err := parseTime(c.String(FlagEndTime), time.Time{}, now)
-		if err != nil {
-			return nil, err
-		}
+		t := parseTime(c.String(FlagEndTime), time.Time{}, now)
 		out.EndTime = timestamp.TimePtr(t)
 	}
 	if c.IsSet(FlagJitter) {
@@ -142,12 +129,8 @@ func buildScheduleSpec(c *cli.Context) (*schedpb.ScheduleSpec, error) {
 }
 
 func buildScheduleAction(c *cli.Context) (*schedpb.ScheduleAction, error) {
-	taskQueue, _, et, rt, dt, wid := startWorkflowBaseArgs(c)
-	workflowType := c.String(FlagWorkflowType)
-	inputs, err := processJSONInput(c)
-	if err != nil {
-		return nil, err
-	}
+	taskQueue, workflowType, et, rt, dt, wid := startWorkflowBaseArgs(c)
+	inputs := processJSONInput(c)
 
 	// TODO: allow specifying: memo, search attributes, workflow retry policy
 
@@ -223,18 +206,14 @@ func buildSchedule(c *cli.Context) (*schedpb.Schedule, error) {
 	return sched, nil
 }
 
-func getMemoAndSearchAttributesForSchedule(c *cli.Context) (*common.Memo, *common.SearchAttributes, error) {
-	if memoMap, err := unmarshalMemoFromCLI(c); err != nil {
-		return nil, nil, err
-	} else if memo, err := encodeMemo(memoMap); err != nil {
-		return nil, nil, err
-	} else if saMap, err := unmarshalSearchAttrFromCLI(c); err != nil {
-		return nil, nil, err
-	} else if sa, err := encodeSearchAttributes(saMap); err != nil {
-		return nil, nil, err
-	} else {
-		return memo, sa, nil
-	}
+func getMemoAndSearchAttributesForSchedule(c *cli.Context) (*common.Memo, *common.SearchAttributes) {
+	memoMap := unmarshalMemoFromCLI(c)
+	memo := encodeMemo(memoMap)
+
+	saMap := unmarshalSearchAttrFromCLI(c)
+	sa := encodeSearchAttributes(saMap)
+
+	return memo, sa
 }
 
 func CreateSchedule(c *cli.Context) error {
@@ -249,7 +228,7 @@ func CreateSchedule(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	memo, sa, err := getMemoAndSearchAttributesForSchedule(c)
+	memo, sa := getMemoAndSearchAttributesForSchedule(c)
 	if err != nil {
 		return err
 	}
@@ -269,7 +248,7 @@ func CreateSchedule(c *cli.Context) error {
 		return fmt.Errorf("unable to create schedule: %w", err)
 	}
 
-	fmt.Println(color.Green(c, "Schedule created"))
+	fmt.Println(color.GreenString("Schedule created"))
 	return nil
 }
 
@@ -299,7 +278,7 @@ func UpdateSchedule(c *cli.Context) error {
 		return fmt.Errorf("unable to update schedule: %w", err)
 	}
 
-	fmt.Println(color.Green(c, "Schedule updated"))
+	fmt.Println(color.GreenString("Schedule updated"))
 	return nil
 }
 
@@ -336,7 +315,7 @@ func ToggleSchedule(c *cli.Context) error {
 		return fmt.Errorf("unable to toggle schedule: %w", err)
 	}
 
-	fmt.Println(color.Green(c, "Schedule updated"))
+	fmt.Println(color.GreenString("Schedule updated"))
 	return nil
 }
 
@@ -369,7 +348,7 @@ func TriggerSchedule(c *cli.Context) error {
 		return fmt.Errorf("unable to trigger schedule: %w", err)
 	}
 
-	fmt.Println(color.Green(c, "Trigger request sent"))
+	fmt.Println(color.GreenString("Trigger request sent"))
 	return nil
 }
 
@@ -382,14 +361,9 @@ func BackfillSchedule(c *cli.Context) error {
 	defer cancel()
 
 	now := time.Now()
-	startTime, err := parseTime(c.String(FlagStartTime), time.Time{}, now)
-	if err != nil {
-		return err
-	}
-	endTime, err := parseTime(c.String(FlagEndTime), time.Time{}, now)
-	if err != nil {
-		return err
-	}
+	startTime := parseTime(c.String(FlagStartTime), time.Time{}, now)
+	endTime := parseTime(c.String(FlagEndTime), time.Time{}, now)
+
 	overlap, err := getOverlapPolicy(c)
 	if err != nil {
 		return err
@@ -415,7 +389,7 @@ func BackfillSchedule(c *cli.Context) error {
 		return fmt.Errorf("unable to backfill schedule: %w", err)
 	}
 
-	fmt.Println(color.Green(c, "Backfill request sent"))
+	fmt.Println(color.GreenString("Backfill request sent"))
 	return nil
 }
 
@@ -538,7 +512,7 @@ func DescribeSchedule(c *cli.Context) error {
 			"Info.InvalidScheduleError",
 		},
 	}
-	return output.PrintItems(c, []interface{}{item}, opts)
+	return output.PrintItems(nil, []interface{}{item}, opts)
 }
 
 func DeleteSchedule(c *cli.Context) error {
@@ -559,16 +533,13 @@ func DeleteSchedule(c *cli.Context) error {
 		return fmt.Errorf("unable to delete schedule: %w", err)
 	}
 
-	fmt.Println(color.Green(c, "Schedule deleted"))
+	fmt.Println(color.GreenString("Schedule deleted"))
 	return nil
 }
 
 func ListSchedules(c *cli.Context) error {
 	frontendClient := cFactory.FrontendClient(c)
-	namespace, err := requiredFlag(c, FlagNamespace)
-	if err != nil {
-		return err
-	}
+	namespace := getRequiredGlobalOption(c, FlagNamespace)
 	ctx, cancel := newContext(c)
 	defer cancel()
 
@@ -633,11 +604,11 @@ func ListSchedules(c *cli.Context) error {
 		Pager:      pager.Less,
 	}
 	if missingExtendedInfo {
-		fmt.Println(color.Yellow(c, "Note: Extended schedule information is not available without Elasticsearch"))
+		fmt.Println(color.YellowString("Note: Extended schedule information is not available without Elasticsearch"))
 		opts.Fields = []string{"ScheduleId"}
 		opts.FieldsLong = nil
 	}
-	return output.PrintIterator(c, iter, opts)
+	return output.PrintIterator(nil, iter, opts)
 }
 
 func uncanonicalizeSpec(spec *schedpb.ScheduleSpec) {
@@ -669,4 +640,22 @@ func uncanonicalizeSpec(spec *schedpb.ScheduleSpec) {
 		})
 	}
 	spec.StructuredCalendar = nil
+}
+
+func startWorkflowBaseArgs(c *cli.Context) (
+	taskQueue string,
+	workflowType string,
+	et, rt, dt int,
+	wid string,
+) {
+	taskQueue = c.String(FlagTaskQueue)
+	workflowType = c.String(FlagWorkflowType)
+	et = c.Int(FlagWorkflowExecutionTimeout)
+	rt = c.Int(FlagWorkflowRunTimeout)
+	dt = c.Int(FlagWorkflowTaskTimeout)
+	wid = c.String(FlagWorkflowID)
+	if len(wid) == 0 {
+		wid = uuid.New()
+	}
+	return
 }
