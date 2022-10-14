@@ -31,7 +31,7 @@ import (
 
 func newScheduleCommands() []cli.Command {
 	sid := &cli.StringFlag{
-		Name:     FlagScheduleID,
+		Name:     FlagScheduleIDWithAlias,
 		Usage:    "Schedule Id",
 		Required: true,
 	}

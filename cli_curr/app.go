@@ -157,7 +157,7 @@ func NewCliApp() *cli.App {
 		},
 		{
 			Name:        "schedule",
-			Usage:       "Schedule a workflow",
+			Usage:       "Operate schedules",
 			Subcommands: newScheduleCommands(),
 		},
 		{

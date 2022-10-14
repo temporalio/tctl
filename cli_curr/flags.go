@@ -245,6 +245,7 @@ const (
 	FlagConnectionEnable                      = "enable_connection"
 	FlagConnectionEnableWithAlias             = FlagConnectionEnable + ", ec"
 	FlagScheduleID                            = "schedule_id"
+	FlagScheduleIDWithAlias                   = FlagScheduleID + ", sid, s"
 	FlagOverlapPolicy                         = "overlap_policy"
 	FlagCalendar                              = "calendar"
 	FlagInterval                              = "interval"

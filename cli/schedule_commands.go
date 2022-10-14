@@ -142,8 +142,7 @@ func buildScheduleSpec(c *cli.Context) (*schedpb.ScheduleSpec, error) {
 }
 
 func buildScheduleAction(c *cli.Context) (*schedpb.ScheduleAction, error) {
-	taskQueue, _, et, rt, dt, wid := startWorkflowBaseArgs(c)
-	workflowType := c.String(FlagWorkflowType)
+	taskQueue, workflowType, et, rt, dt, wid := startWorkflowBaseArgs(c)
 	inputs, err := processJSONInput(c)
 	if err != nil {
 		return nil, err
