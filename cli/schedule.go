@@ -197,10 +197,6 @@ func newScheduleCommands() []*cli.Command {
 			Usage: "Get schedule configuration and current state",
 			Flags: append([]cli.Flag{
 				sid,
-				&cli.BoolFlag{
-					Name:  FlagPrintRaw,
-					Usage: "Print raw data as json (prefer this over -o json for scripting)",
-				},
 			}, flags.FlagsForRendering...),
 			Action: DescribeSchedule,
 		},

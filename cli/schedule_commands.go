@@ -435,11 +435,6 @@ func DescribeSchedule(c *cli.Context) error {
 		return fmt.Errorf("unable to describe schedule: %w", err)
 	}
 
-	if c.Bool(FlagPrintRaw) {
-		prettyPrintJSONObject(resp)
-		return nil
-	}
-
 	// output.PrintItems gets confused by nested fields of nil values, because it uses
 	// reflection. ensure the first level is non-nil to avoid runtime errors.
 	ensureNonNil(&resp.Schedule)
