@@ -48,6 +48,7 @@ func useDynamicCommands(app *cli.App) {
 			if err := executePlugin(ctx, path, os.Args, os.Environ()); err != nil {
 				fmt.Fprintf(os.Stderr, "unable to complete plugin execution\n%s\n", err)
 			}
+			return
 		}
 
 		fmt.Fprintf(os.Stderr, "%s is not a command. See '%s --help\n'", cmdToFind, ctx.App.Name)
