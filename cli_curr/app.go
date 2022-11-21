@@ -162,12 +162,12 @@ func NewCliApp() *cli.App {
 		},
 		{
 			Name:        "batch",
-			Usage:       "Batch operation on a list of workflows from query",
+			Usage:       "Batch operation on a list of workflows from query (deprecated)",
 			Subcommands: newBatchCommands(),
 		},
 		{
 			Name:        "batch-v2",
-			Usage:       "Batch operation on a list of workflows from query",
+			Usage:       "Operate on batch jobs. Use workflow commands with --query flag to start batch job",
 			Subcommands: newBatchV2Commands(),
 		},
 		{
