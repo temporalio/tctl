@@ -30,21 +30,20 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/urfave/cli"
+
 	"go.temporal.io/api/workflowservice/v1"
-
-	"go.temporal.io/server/common/clock"
-	"go.temporal.io/server/common/config"
-
-	"go.temporal.io/server/common"
 	"go.temporal.io/server/common/archiver"
 	"go.temporal.io/server/common/archiver/provider"
+	"go.temporal.io/server/common/clock"
 	"go.temporal.io/server/common/cluster"
+	"go.temporal.io/server/common/config"
 	"go.temporal.io/server/common/dynamicconfig"
 	"go.temporal.io/server/common/log"
 	"go.temporal.io/server/common/metrics"
 	"go.temporal.io/server/common/namespace"
 	"go.temporal.io/server/common/persistence"
 	"go.temporal.io/server/common/persistence/client"
+	"go.temporal.io/server/common/primitives"
 	"go.temporal.io/server/common/resolver"
 )
 
@@ -202,7 +201,7 @@ func initializeAdminNamespaceHandler(
 
 	configuration := loadConfig(context)
 	logger := log.NewZapLogger(log.BuildZapLogger(configuration.Log))
-	metricsClient := initializeMetricsClient(logger)
+	metricsClient := initializeMetricsHandler(logger)
 
 	factory := initializePersistenceFactory(
 		&configuration.Persistence,
@@ -274,7 +273,7 @@ func initializePersistenceFactory(
 	pConfig *config.Persistence,
 	maxQps client.PersistenceMaxQps,
 	clusterName string,
-	metricsClient metrics.Client,
+	metricsHandler metrics.MetricsHandler,
 	logger log.Logger,
 ) client.Factory {
 
@@ -284,14 +283,14 @@ func initializePersistenceFactory(
 		pConfig,
 		nil, // TODO propagate abstract datastore factory from the CLI.
 		logger,
-		metricsClient,
+		metricsHandler,
 	)
 	return client.FactoryProvider(client.NewFactoryParams{
 		DataStoreFactory:  dataStoreFactory,
 		Cfg:               pConfig,
 		PersistenceMaxQPS: maxQps,
 		ClusterName:       client.ClusterName(clusterName),
-		MetricsClient:     metricsClient,
+		MetricsHandler:    metricsHandler,
 		Logger:            logger,
 	})
 }
@@ -331,7 +330,7 @@ func initializeArchivalMetadata(
 func initializeArchivalProvider(
 	serviceConfig *config.Config,
 	clusterMetadata cluster.Metadata,
-	metricsClient metrics.Client,
+	metricsHandler metrics.MetricsHandler,
 	logger log.Logger,
 ) provider.ArchiverProvider {
 
@@ -343,17 +342,17 @@ func initializeArchivalProvider(
 	historyArchiverBootstrapContainer := &archiver.HistoryBootstrapContainer{
 		ExecutionManager: nil, // not used
 		Logger:           logger,
-		MetricsClient:    metricsClient,
+		MetricsHandler:   metricsHandler,
 		ClusterMetadata:  clusterMetadata,
 	}
 	visibilityArchiverBootstrapContainer := &archiver.VisibilityBootstrapContainer{
 		Logger:          logger,
-		MetricsClient:   metricsClient,
+		MetricsHandler:  metricsHandler,
 		ClusterMetadata: clusterMetadata,
 	}
 
 	err := archiverProvider.RegisterBootstrapContainer(
-		common.FrontendServiceName,
+		primitives.FrontendService,
 		historyArchiverBootstrapContainer,
 		visibilityArchiverBootstrapContainer,
 	)
@@ -392,10 +391,8 @@ func initializeDynamicConfig(
 	return dynamicconfig.NewCollection(dynamicConfigClient, logger)
 }
 
-func initializeMetricsClient(logger log.Logger) metrics.Client {
-	provider := metrics.MetricsHandlerFromConfig(logger, &metrics.Config{})
-
-	return metrics.NewClient(provider, metrics.Common)
+func initializeMetricsHandler(logger log.Logger) metrics.MetricsHandler {
+	return metrics.MetricsHandlerFromConfig(logger, &metrics.Config{})
 }
 
 func getEnvironment(c *cli.Context) string {
