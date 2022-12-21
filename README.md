@@ -38,8 +38,8 @@ tctl config set version current
 
 ## Auto-completion
 
-Running `tctl completion SHELL` will output the related completion SHELL code in order to enable the CLI
-auto completion. See the following sections for more details for each specific shell.
+Running `tctl completion SHELL` will output the related completion SHELL code. See the following
+sections for more details for each specific shell / OS and how to enable it.
 
 ### zsh auto-completion
 
@@ -53,6 +53,44 @@ or from your terminal run:
 
 ```sh
 echo 'source <(tctl completion zsh)' >> ~/.zshrc
+```
+
+Then run `source ~/.zshrc`.
+
+### Bash auto-completion (linux)
+
+Bash auto-completion relies on [bash-completion](https://github.com/scop/bash-completion#installation). Make sure
+you follow the instruction [here](https://github.com/scop/bash-completion#installation) and install the software or
+use a package manager to install it like `apt-get install bash-completion` or `yum install bash-completion`, etc. For example
+on alpine linux:
+
+-   apk update
+-   apk add bash-completion
+-   echo 'source /etc/profile.d/bash_completion.sh' >> ~/.bashrc
+
+Verify that bash-completion is installed by running `type _init_completion` add the following to your `.bashrc`
+file to enable completion for tctl
+
+```
+echo 'source <(tctl completion bash)' >>~/.bashrc
+source ~/.bashrc
+```
+
+### Bash auto-completion (macos)
+
+For macos you can install it via brew `brew install bash-completion@2` and add the following line to
+your `~/.bashrc`:
+
+```sh
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+```
+
+Verify that bash-completion is installed by running `type _init_completion` and add the following to your `.bashrc`
+file to enable completion for tctl
+
+```
+echo 'source <(tctl completion bash)' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ## License

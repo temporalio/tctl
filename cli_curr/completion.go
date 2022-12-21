@@ -1,16 +1,16 @@
-package cli
+package cli_curr
 
 import (
 	"github.com/temporalio/tctl/completion"
-
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli"
 )
 
-func newCompletionCommand() *cli.Command {
-	return &cli.Command{
-		Name:        "completion",
+
+func newCompletionCommand() cli.Command {
+	return cli.Command{
+		Name:    "completion",
 		Usage:       "Output shell completion code for the specified shell (zsh, bash)",
-		Subcommands: []*cli.Command{
+		Subcommands: []cli.Command{
 			{
 				Name:      "zsh",
 				Usage:       "zsh completion output",
