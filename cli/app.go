@@ -50,6 +50,7 @@ func NewCliApp() *cli.App {
 	app.Name = "tctl"
 	app.Usage = "A command-line tool for Temporal users"
 	app.Version = "next"
+	app.EnableBashCompletion = true
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{
 			Name:    FlagAddress,

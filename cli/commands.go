@@ -84,4 +84,5 @@ var tctlCommands = []*cli.Command{
 		Usage:       "Create an alias for a command",
 		Subcommands: newAliasCommand(),
 	},
+	newCompletionCommand(),
 }

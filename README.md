@@ -5,9 +5,10 @@ The Temporal CLI is a command-line tool you can use to perform various tasks on 
 Documentation for the Temporal command line interface is located at our [main site](https://docs.temporal.io/docs/system-tools/tctl).
 
 ## Quick Start
-Run `make` from the project root. You should see an executable file called `tctl`. Try a few example commands to 
-get started:   
-`./tctl` for help on top level commands and global options   
+
+Run `make` from the project root. You should see an executable file called `tctl`. Try a few example commands to
+get started:  
+`./tctl` for help on top level commands and global options  
 `./tctl namespace` for help on namespace operations  
 `./tctl workflow` for help on workflow operations  
 `./tctl task-queue` for help on tasklist operations  
@@ -35,6 +36,29 @@ To switch back to the stable v1, run
 tctl config set version current
 ```
 
+## Auto-completion
+
+Running `tctl completion SHELL` will output the related completion SHELL code in order to enable the CLI
+auto completion. See the following sections for more details for each specific shell.
+
+### zsh auto-completion
+
+Add the following to your `~/.zshrc` file:
+
+```sh
+source <(tctl completion zsh)
+```
+
+or from your terminal run:
+
+```sh
+echo 'source <(tctl completion zsh)' >> ~/.zshrc
+```
+
 ## License
 
 MIT License, please see [LICENSE](https://github.com/temporalio/tctl/blob/master/LICENSE) for details.
+
+```
+
+```
