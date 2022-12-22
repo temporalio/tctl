@@ -3,12 +3,10 @@ package completion
 import (
 	"fmt"
 	"os"
-
-	"github.com/pkg/errors"
 )
 
 // taken from https://github.com/urfave/cli/blob/master/autocomplete/zsh_autocomplete
-var zsh = `
+var zsh_script = `
 #compdef tctl
 
 _cli_zsh_autocomplete() {
@@ -33,7 +31,7 @@ _cli_zsh_autocomplete() {
 compdef _cli_zsh_autocomplete tctl
 `
 
-var bash = `
+var bash_script = `
 #! /bin/bash
 
 _cli_bash_autocomplete() {
@@ -52,23 +50,47 @@ _cli_bash_autocomplete() {
 }
 
 complete -o bashdefault -o default -o nospace -F _cli_bash_autocomplete tctl
-unset tctl
 `
 
+var (
+	schellScriptMap = map[string]func() {
+		"bash": func() { fmt.Fprintln(os.Stdout, bash_script) },
+		"zsh":  func() { fmt.Fprintln(os.Stdout, zsh_script) },
+	}
+)
+
 type Shell string
+
 const (
 	BASH Shell = "bash"
 	ZSH  Shell = "zsh"
 )
+type shellConfig struct {
+  Name Shell
+  Usage string
+}
 
-func Print(shell Shell) error {
-	if shell == BASH {
-		fmt.Fprintln(os.Stdout, bash)
-	} else if shell == ZSH {
-		fmt.Fprintln(os.Stdout, zsh)
-	} else {
-    return errors.Errorf("unsupported shell type %q for completion", shell)
-  }
-	
-	return nil
+type commandConfig struct {
+  Name string
+  Usage string
+  Shells []shellConfig
+}
+
+func (s shellConfig) Print() {
+  schellScriptMap[string(s.Name)]()
+}
+
+var CommandConfig commandConfig = commandConfig{
+  Name: "completion", 
+  Usage: "Output shell completion code for the specified shell (zsh, bash)",
+  Shells: []shellConfig {
+    {
+      Name: ZSH,
+      Usage: "zsh completion output",
+    },
+    {
+      Name: BASH,
+      Usage: "bash completion output",
+    },
+  },
 }

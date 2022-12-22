@@ -66,7 +66,7 @@ on alpine linux:
 
 -   apk update
 -   apk add bash-completion
--   echo 'source /etc/profile.d/bash_completion.sh' >> ~/.bashrc
+-   source /etc/profile.d/bash_completion.sh
 
 Verify that bash-completion is installed by running `type _init_completion` add the following to your `.bashrc`
 file to enable completion for tctl
@@ -96,7 +96,3 @@ source ~/.bashrc
 ## License
 
 MIT License, please see [LICENSE](https://github.com/temporalio/tctl/blob/master/LICENSE) for details.
-
-```
-
-```

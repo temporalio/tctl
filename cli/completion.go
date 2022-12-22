@@ -7,24 +7,23 @@ import (
 )
 
 func newCompletionCommand() *cli.Command {
+	var subCommands = []*cli.Command{}
+	for _, shell := range completion.CommandConfig.Shells {
+		cmd := &cli.Command{
+			Name: string(shell.Name),
+			Usage: shell.Usage,
+			Action: func(c *cli.Context) error {
+				shell.Print()
+				return nil
+			},
+		
+		}
+		subCommands = append(subCommands, cmd)
+	}
+
 	return &cli.Command{
-		Name:        "completion",
-		Usage:       "Output shell completion code for the specified shell (zsh, bash)",
-		Subcommands: []*cli.Command{
-			{
-				Name:      "zsh",
-				Usage:       "zsh completion output",
-				Action: func(c *cli.Context) error {
-					return completion.Print(completion.ZSH)
-				},
-			},
-			{
-				Name:      "bash",
-				Usage:       "bash completion output",
-				Action: func(c *cli.Context) error {
-					return completion.Print(completion.BASH)
-				},
-			},
-		},
+		Name: completion.CommandConfig.Name,
+		Usage: completion.CommandConfig.Usage,
+		Subcommands: subCommands,
 	}
 }
