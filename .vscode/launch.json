@@ -10,9 +10,9 @@
       "program": "${workspaceFolder}/cmd/tctl",
       "cwd": "${workspaceFolder}",
       "args": [
-        "config",
-        "get",
-        "version",
+        "workflow",
+        "list",
+        "-h",
       ]
     },
     {

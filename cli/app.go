@@ -29,14 +29,13 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/urfave/cli/v2"
-
+	fcolor "github.com/fatih/color"
 	"github.com/temporalio/tctl-kit/pkg/color"
-
 	"github.com/temporalio/tctl/cli/dataconverter"
 	"github.com/temporalio/tctl/cli/headersprovider"
 	"github.com/temporalio/tctl/cli/plugin"
 	"github.com/temporalio/tctl/config"
+	"github.com/urfave/cli/v2"
 )
 
 // SetFactory is used to set the ClientFactory global
@@ -139,6 +138,17 @@ func NewCliApp() *cli.App {
 	app.Before = configureSDK
 	app.After = stopPlugins
 	app.ExitErrHandler = handleError
+
+	tctlNextDeprecation := fcolor.YellowString("WARNING: tctl next is going to be deprecated. Consider switching back to tctl v1 or upgrading to Temporal single binary https://github.com/temporalio/cli#getting-started\n")
+	app.CustomAppHelpTemplate = cli.AppHelpTemplate + "\n" + tctlNextDeprecation
+
+	for _, cmd := range app.Commands {
+		cmd.CustomHelpTemplate = cli.CommandHelpTemplate + tctlNextDeprecation
+
+		for _, subcmd := range cmd.Subcommands {
+			subcmd.CustomHelpTemplate = cli.CommandHelpTemplate + tctlNextDeprecation
+		}
+	}
 
 	// set builder if not customized
 	if cFactory == nil {
