@@ -68,6 +68,19 @@
       ]
     },
     {
+      "name": "temporalite:admin:workflow:show",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/cmd/tctl",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "admin",
+        "wf",
+        "show"
+      ]
+    },
+    {
       "name": "temporalite:debug",
       "type": "go",
       "request": "launch",
