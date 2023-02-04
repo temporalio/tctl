@@ -139,7 +139,7 @@ func NewCliApp() *cli.App {
 	app.After = stopPlugins
 	app.ExitErrHandler = handleError
 
-	tctlNextDeprecation := fcolor.YellowString("WARNING: tctl next is going to be deprecated. Consider switching back to tctl v1 or upgrading to Temporal single binary https://github.com/temporalio/cli#getting-started\n")
+	tctlNextDeprecation := fcolor.YellowString("WARNING: tctl next is going to be deprecated. Please upgrade to Temporal CLI https://github.com/temporalio/cli#getting-started\n")
 	app.CustomAppHelpTemplate = cli.AppHelpTemplate + "\n" + tctlNextDeprecation
 
 	for _, cmd := range app.Commands {
