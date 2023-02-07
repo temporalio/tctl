@@ -39,7 +39,6 @@ import (
 	"go.temporal.io/api/serviceerror"
 	"go.temporal.io/api/workflowservice/v1"
 
-	"go.temporal.io/server/common/namespace"
 	"go.temporal.io/server/common/primitives/timestamp"
 )
 
@@ -47,9 +46,6 @@ type (
 	namespaceCLIImpl struct {
 		// used when making RPC call to frontend service``
 		frontendClient workflowservice.WorkflowServiceClient
-
-		// act as admin to modify namespace in DB directly
-		namespaceHandler namespace.Handler
 	}
 )
 
@@ -58,21 +54,8 @@ func newNamespaceCLI(
 	c *cli.Context,
 	isAdminMode bool,
 ) *namespaceCLIImpl {
-
-	var frontendClient workflowservice.WorkflowServiceClient
-	var namespaceHandler namespace.Handler
-	if !isAdminMode {
-		frontendClient = initializeFrontendClient(c)
-	} else {
-		var err error
-		namespaceHandler, err = initializeAdminNamespaceHandler(c)
-		if err != nil {
-			ErrorAndExit("Unable to initialize admin namespace handler", err)
-		}
-	}
 	return &namespaceCLIImpl{
-		frontendClient:   frontendClient,
-		namespaceHandler: namespaceHandler,
+		frontendClient: initializeFrontendClient(c),
 	}
 }
 
@@ -433,7 +416,7 @@ func (d *namespaceCLIImpl) listNamespaces(
 		return d.frontendClient.ListNamespaces(ctx, request)
 	}
 
-	return d.namespaceHandler.ListNamespaces(ctx, request)
+	return d.frontendClient.ListNamespaces(ctx, request)
 }
 
 func (d *namespaceCLIImpl) registerNamespace(
@@ -445,7 +428,7 @@ func (d *namespaceCLIImpl) registerNamespace(
 		return err
 	}
 
-	_, err := d.namespaceHandler.RegisterNamespace(ctx, request)
+	_, err := d.frontendClient.RegisterNamespace(ctx, request)
 	return err
 }
 
@@ -458,7 +441,7 @@ func (d *namespaceCLIImpl) updateNamespace(
 		return err
 	}
 
-	_, err := d.namespaceHandler.UpdateNamespace(ctx, request)
+	_, err := d.frontendClient.UpdateNamespace(ctx, request)
 	return err
 }
 
@@ -471,7 +454,7 @@ func (d *namespaceCLIImpl) describeNamespace(
 		return d.frontendClient.DescribeNamespace(ctx, request)
 	}
 
-	resp, err := d.namespaceHandler.DescribeNamespace(ctx, request)
+	resp, err := d.frontendClient.DescribeNamespace(ctx, request)
 	return resp, err
 }
 

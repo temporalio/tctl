@@ -589,7 +589,7 @@ func AdminListGossipMembers(c *cli.Context) {
 	}
 
 	members := response.MembershipInfo.Rings
-	if roleFlag != primitives.AllServices {
+	if roleFlag != string(primitives.AllServices) {
 		all := members
 
 		members = members[:0]
