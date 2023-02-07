@@ -575,12 +575,15 @@ func (s *cliAppSuite) TestAdminAddSearchAttributes() {
 		SearchAttributes: map[string]enumspb.IndexedValueType{
 			"testKey": enumspb.INDEXED_VALUE_TYPE_KEYWORD,
 		},
+		Namespace: cliTestNamespace,
 	}
 	s.serverAdminClient.EXPECT().AddSearchAttributes(gomock.Any(), request)
 
-	getRequest := &adminservice.GetSearchAttributesRequest{}
+	getRequest := &adminservice.GetSearchAttributesRequest{
+		Namespace: cliTestNamespace,
+	}
 	getResponse := &adminservice.GetSearchAttributesResponse{}
-	s.serverAdminClient.EXPECT().GetSearchAttributes(gomock.Any(), getRequest).Return(getResponse, nil).Times(2)
+	s.serverAdminClient.EXPECT().GetSearchAttributes(gomock.Any(), getRequest).Return(getResponse, nil)
 
 	err := s.app.Run([]string{"", "--auto_confirm", "--ns", cliTestNamespace, "admin", "cl", "asa", "--name", "testKey", "--type", "keyword"})
 	s.Nil(err)
@@ -589,18 +592,18 @@ func (s *cliAppSuite) TestAdminAddSearchAttributes() {
 func (s *cliAppSuite) TestAdminRemoveSearchAttributes() {
 	request := &adminservice.RemoveSearchAttributesRequest{
 		SearchAttributes: []string{"testKey"},
+		Namespace:        cliTestNamespace,
 	}
 	s.serverAdminClient.EXPECT().RemoveSearchAttributes(gomock.Any(), request)
-
-	getRequest := &adminservice.GetSearchAttributesRequest{}
-	s.serverAdminClient.EXPECT().GetSearchAttributes(gomock.Any(), getRequest)
 
 	err := s.app.Run([]string{"", "--auto_confirm", "--ns", cliTestNamespace, "admin", "cl", "rsa", "--name", "testKey"})
 	s.Nil(err)
 }
 
 func (s *cliAppSuite) TestAdminGetSearchAttributes() {
-	getRequest := &adminservice.GetSearchAttributesRequest{}
+	getRequest := &adminservice.GetSearchAttributesRequest{
+		Namespace: cliTestNamespace,
+	}
 	s.serverAdminClient.EXPECT().GetSearchAttributes(gomock.Any(), getRequest)
 
 	err := s.app.Run([]string{"", "--ns", cliTestNamespace, "admin", "cl", "gsa"})

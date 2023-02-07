@@ -43,11 +43,15 @@ const (
 
 // ListSearchAttributes lists search attributes
 func ListSearchAttributes(c *cli.Context) error {
+	namespace := c.String(FlagNamespace)
 	client := cFactory.OperatorClient(c)
 	ctx, cancel := newContext(c)
 	defer cancel()
 
-	resp, err := client.ListSearchAttributes(ctx, &operatorservice.ListSearchAttributesRequest{})
+	resp, err := client.ListSearchAttributes(
+		ctx,
+		&operatorservice.ListSearchAttributesRequest{Namespace: namespace},
+	)
 	if err != nil {
 		return fmt.Errorf("unable to list search attributes: %w", err)
 	}
@@ -75,6 +79,7 @@ func ListSearchAttributes(c *cli.Context) error {
 
 // AddSearchAttributes to add search attributes
 func AddSearchAttributes(c *cli.Context) error {
+	namespace := c.String(FlagNamespace)
 	names := c.StringSlice(FlagName)
 	typeStrs := c.StringSlice(FlagType)
 
@@ -125,6 +130,7 @@ func AddSearchAttributes(c *cli.Context) error {
 
 	request := &operatorservice.AddSearchAttributesRequest{
 		SearchAttributes: searchAttributes,
+		Namespace:        namespace,
 	}
 
 	ctx, cancel = newContextWithTimeout(c, addSearchAttributesTimeout)
@@ -139,6 +145,7 @@ func AddSearchAttributes(c *cli.Context) error {
 
 // RemoveSearchAttributes to add search attributes
 func RemoveSearchAttributes(c *cli.Context) error {
+	namespace := c.String(FlagNamespace)
 	names := c.StringSlice(FlagName)
 
 	promptMsg := fmt.Sprintf(
@@ -154,6 +161,7 @@ func RemoveSearchAttributes(c *cli.Context) error {
 	defer cancel()
 	request := &operatorservice.RemoveSearchAttributesRequest{
 		SearchAttributes: names,
+		Namespace:        namespace,
 	}
 
 	_, err := client.RemoveSearchAttributes(ctx, request)
