@@ -116,6 +116,28 @@ func newAdminWorkflowCommands() []cli.Command {
 			},
 		},
 		{
+			Name:    "rebuild",
+			Aliases: []string{"rb"},
+			Usage:   "Rebuild workflow",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  FlagNamespaceWithAlias,
+					Usage: "Namespace",
+				},
+				cli.StringFlag{
+					Name:  FlagWorkflowIDWithAlias,
+					Usage: "WorkflowId",
+				},
+				cli.StringFlag{
+					Name:  FlagRunIDWithAlias,
+					Usage: "RunId",
+				},
+			},
+			Action: func(c *cli.Context) {
+				AdminRebuildWorkflow(c)
+			},
+		},
+		{
 			Name:    "delete",
 			Aliases: []string{"del"},
 			Usage:   "Delete current workflow execution and the mutableState record",
