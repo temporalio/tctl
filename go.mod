@@ -5,7 +5,6 @@ go 1.18
 require (
 	github.com/fatih/color v1.13.0
 	github.com/gogo/protobuf v1.3.2
-	github.com/gogo/status v1.1.1
 	github.com/golang/mock v1.6.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/go-hclog v1.3.1
@@ -16,7 +15,6 @@ require (
 	github.com/stretchr/testify v1.8.1
 	github.com/temporalio/tctl-kit v0.0.0-20221128225502-a682971cf481
 	github.com/urfave/cli v1.22.10
-	github.com/urfave/cli/v2 v2.4.0
 	go.temporal.io/api v1.18.1
 	go.temporal.io/sdk v1.21.1
 	go.temporal.io/server v1.18.1-0.20230217005328-b313b7f58641
@@ -48,6 +46,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gocql/gocql v1.3.0 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
+	github.com/gogo/status v1.1.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -93,6 +92,7 @@ require (
 	github.com/twmb/murmur3 v1.1.6 // indirect
 	github.com/uber-common/bark v1.3.0 // indirect
 	github.com/uber-go/tally/v4 v4.1.3 // indirect
+	github.com/urfave/cli/v2 v2.4.0 // indirect
 	github.com/xwb1989/sqlparser v0.0.0-20180606152119-120387863bf2 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.4 // indirect

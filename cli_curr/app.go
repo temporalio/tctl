@@ -25,9 +25,6 @@
 package cli_curr
 
 import (
-	"fmt"
-
-	"github.com/temporalio/tctl/config"
 	"github.com/urfave/cli"
 
 	"github.com/temporalio/tctl/cli_curr/dataconverter"
@@ -256,13 +253,6 @@ func NewCliApp() *cli.App {
 	// set builder if not customized
 	if cFactory == nil {
 		SetFactory(NewClientFactory())
-	}
-
-	if tctlConfig == nil {
-		var err error
-		if tctlConfig, err = config.NewTctlConfig(); err != nil {
-			fmt.Printf("unable to load tctl config: %v", err)
-		}
 	}
 
 	return app

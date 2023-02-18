@@ -19,12 +19,6 @@ get started:
 
 **Note:** Make sure you have a Temporal server running before using the CLI.
 
-### Trying out the new `temporal` CLI
-
-**Note** Switching to `temporal` CLI is not recommended on production environments.
-
-`tctl next` is going to be deprecated. Please upgrade to Temporal CLI https://github.com/temporalio/cli#getting-started
-
 ## Auto-completion
 
 Running `tctl completion SHELL` will output the related completion SHELL code. See the following
