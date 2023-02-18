@@ -30,8 +30,8 @@ import (
 	"github.com/temporalio/tctl/config"
 	"github.com/urfave/cli"
 
-	"github.com/temporalio/tctl/cli/headers"
 	"github.com/temporalio/tctl/cli_curr/dataconverter"
+	"github.com/temporalio/tctl/cli_curr/headers"
 	"github.com/temporalio/tctl/cli_curr/headersprovider"
 	"github.com/temporalio/tctl/cli_curr/plugin"
 )

@@ -28,24 +28,15 @@ import (
 	"log"
 	"os"
 
-	"github.com/temporalio/tctl/cli"
 	"github.com/temporalio/tctl/cli_curr"
-	"github.com/temporalio/tctl/config"
 )
 
 // See https://docs.temporal.io/tctl/ for usage
 func main() {
-	tctlConfig, _ := config.NewTctlConfig()
-	version := tctlConfig.Version
-
 	var err error
-	if version == "next" || version == "2" {
-		appNext := cli.NewCliApp()
-		err = appNext.Run(os.Args)
-	} else {
-		app := cli_curr.NewCliApp()
-		err = app.Run(os.Args)
-	}
+
+	app := cli_curr.NewCliApp()
+	err = app.Run(os.Args)
 
 	if err != nil {
 		log.Fatal(err)
