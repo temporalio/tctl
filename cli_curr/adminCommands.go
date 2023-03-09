@@ -26,7 +26,9 @@ package cli_curr
 
 import (
 	"context"
+	"encoding/csv"
 	"fmt"
+	"io"
 	"math"
 	"net/url"
 	"os"
@@ -222,6 +224,49 @@ func AdminDeleteWorkflow(c *cli.Context) {
 	}
 
 	fmt.Println("Workflow execution deleted.")
+}
+
+func AdminBatchDeleteWorkflow(c *cli.Context) {
+	adminClient := cFactory.AdminClient(c)
+
+	namespace := getRequiredGlobalOption(c, FlagNamespace)
+
+	ctx, cancel := newContext(c)
+	defer cancel()
+	fileName := c.String("workflowlist")
+	if fileName == "" {
+		fileName = "workflows.csv"
+	}
+	f, err := os.Open(fileName)
+	if err != nil {
+		panic(err)
+	}
+	r := csv.NewReader(f)
+	for {
+		wf, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		resp, err := adminClient.DeleteWorkflowExecution(ctx, &adminservice.DeleteWorkflowExecutionRequest{
+			Namespace: namespace,
+			Execution: &commonpb.WorkflowExecution{
+				WorkflowId: wf[0],
+				RunId:      wf[1],
+			},
+		})
+		if err != nil {
+			fmt.Printf("failed to delete workflow wid: %s rid:%s\n", wf[0], wf[1])
+		} else {
+			if len(resp.Warnings) != 0 {
+				fmt.Println("Warnings:")
+				for _, warning := range resp.Warnings {
+					fmt.Printf("- %s\n", warning)
+				}
+				fmt.Println("")
+			}
+		}
+	}
+
 }
 
 func adminDeleteVisibilityDocument(c *cli.Context, namespaceID string) {

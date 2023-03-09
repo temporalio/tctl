@@ -137,6 +137,19 @@ func newAdminWorkflowCommands() []cli.Command {
 				AdminDeleteWorkflow(c)
 			},
 		},
+		{
+			Name:  "batch_delete",
+			Usage: "Delete current workflow execution and the mutableState record",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "workflowlist",
+					Usage: "csv of workflow ids and run ids",
+				},
+			},
+			Action: func(c *cli.Context) {
+				AdminBatchDeleteWorkflow(c)
+			},
+		},
 	}
 }
 
