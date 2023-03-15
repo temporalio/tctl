@@ -353,7 +353,7 @@ func (s *cliAppSuite) TestCancelWorkflow_Failed() {
 
 func (s *cliAppSuite) TestSignalWorkflow() {
 	s.frontendClient.EXPECT().SignalWorkflowExecution(gomock.Any(), gomock.Any()).Return(nil, nil)
-	err := s.app.Run([]string{"", "--ns", cliTestNamespace, "workflow", "signal", "-w", "wid", "-n", "signal-name"})
+	err := s.app.Run([]string{"", "--ns", cliTestNamespace, "workflow", "signal", "-w", "wid", "-n", "signal-name", "--input", `"json1"`, "--input", `"json2"`})
 	s.Nil(err)
 }
 
