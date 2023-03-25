@@ -116,7 +116,7 @@ func newWorkflowCommands() []cli.Command {
 					Name:  FlagNameWithAlias,
 					Usage: "SignalName",
 				},
-				cli.StringFlag{
+				cli.StringSliceFlag{
 					Name:  FlagInputWithAlias,
 					Usage: "Input for the signal, in JSON format.",
 				},
