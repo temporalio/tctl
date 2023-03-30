@@ -22,7 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package sundial
+package trace
 
 import (
 	"fmt"
@@ -242,6 +242,31 @@ var events = map[string]*history.HistoryEvent{
 			WorkflowExecutionStartedEventAttributes: &history.WorkflowExecutionStartedEventAttributes{
 				WorkflowType: &common.WorkflowType{Name: "baz"},
 				Attempt:      1,
+			},
+		},
+	},
+	"child workflow initiated child": { // Child workflow has a child workflow
+		EventId:   50,
+		EventType: enums.EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED,
+		Attributes: &history.HistoryEvent_StartChildWorkflowExecutionInitiatedEventAttributes{
+			StartChildWorkflowExecutionInitiatedEventAttributes: &history.StartChildWorkflowExecutionInitiatedEventAttributes{
+				Namespace:    "default",
+				WorkflowId:   "depth2child",
+				WorkflowType: &common.WorkflowType{Name: "baz"},
+			},
+		},
+	},
+	"child workflow started child": {
+		EventId:   52,
+		EventType: enums.EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_STARTED,
+		Attributes: &history.HistoryEvent_ChildWorkflowExecutionStartedEventAttributes{
+			ChildWorkflowExecutionStartedEventAttributes: &history.ChildWorkflowExecutionStartedEventAttributes{
+				Namespace:        "default",
+				InitiatedEventId: 50,
+				WorkflowExecution: &common.WorkflowExecution{
+					WorkflowId: "depth2child", RunId: "depth2childRunId",
+				},
+				WorkflowType: &common.WorkflowType{Name: "baz"},
 			},
 		},
 	},

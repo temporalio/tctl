@@ -1421,7 +1421,32 @@ func TraceWorkflow(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Trace hasn't been implemented yet.")
+
+	wid := c.String(FlagWorkflowID)
+	rid := c.String(FlagRunID)
+
+	sdkClient, err := getSDKClient(c)
+	if err != nil {
+		return err
+	}
+	//tcCtx, cancel := newIndefiniteContext(c)
+	//defer cancel()
+
+	err = traceWorkflow(c, sdkClient, wid, rid)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func traceWorkflow(c *cli.Context, sdkClient sdkclient.Client, wid, rid string) error {
+	if rid != "" {
+		fmt.Printf("Trace for wid:%s rid:%s\n", wid, rid)
+	} else {
+		fmt.Printf("Trace for wid:%s\n", wid)
+	}
+
 	return nil
 }
 

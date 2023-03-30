@@ -22,24 +22,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package sundial
+package trace
 
 import (
+	"context"
 	"fmt"
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/failure/v1"
 	"go.temporal.io/api/history/v1"
+	"go.temporal.io/api/workflow/v1"
+	sdkclient "go.temporal.io/sdk/client"
 	"strconv"
+	"sync"
 	"time"
 )
 
 // ExecutionState provides a common interface to any execution (Workflows, Activities and Timers in this case) updated through HistoryEvents.
 type ExecutionState interface {
+	// Update updates an ExecutionState with a new HistoryEvent.
 	Update(*history.HistoryEvent)
+	// GetName returns the state's name (usually for displaying to the user).
 	GetName() string
+	// GetAttempt returns the attempts to execute the current ExecutionState.
 	GetAttempt() int32
+	// GetFailure returns the execution's failure (if any).
 	GetFailure() *failure.Failure
+	// GetRetryState returns the execution's RetryState.
 	GetRetryState() enums.RetryState
 
 	GetDuration() *time.Duration
@@ -68,15 +77,18 @@ type WorkflowExecutionState struct {
 
 	// ChildStates contains all the ExecutionStates contained by this WorkflowExecutionState in order of execution.
 	ChildStates []ExecutionState
-	// activityMap contains all the activities executed in the Workflow, indexed by the EVENT_TYPE_ACTIVITY_TASK_SCHEDULED event id.
-	// Used to retrieve the activities from events.
-	activityMap map[int64]*ActivityExecutionState
-	// childWfMap contains all the child workflows executed in the Workflow, indexed by the EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED event id.
-	// Used to retrieve the child workflows from events.
-	childWfMap map[int64]*WorkflowExecutionState
-	// timerMap contains all the timers executed in the Workflow, indexed by the EVENT_TYPE_TIMER_STARTED event id.
-	// Used to retrieve the timers from events.
-	timerMap map[int64]*TimerExecutionState
+	// activityMap contains all the activities executed in the Workflow, indexed by the EVENT_TYPE_ACTIVITY_TASK_SCHEDULED event id
+	// Used to retrieve the activities from events
+	activityMap     map[int64]*ActivityExecutionState
+	activityMapLock sync.RWMutex
+	// childWfMap contains all the child workflows executed in the Workflow, indexed by the EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED event id
+	// Used to retrieve the child workflows from events
+	childWfMap     map[int64]*WorkflowExecutionState
+	childWfMapLock sync.RWMutex
+	// timerMap contains all the timers executed in the Workflow, indexed by the EVENT_TYPE_TIMER_STARTED event id
+	// Used to retrieve the timers from events
+	timerMap     map[int64]*TimerExecutionState
+	timerMapLock sync.RWMutex
 
 	// Non-successful closed states
 	// Failure contains the last failure that the Execution has reported (if any).
@@ -106,6 +118,14 @@ func NewWorkflowExecutionState(wfId, runId string) *WorkflowExecutionState {
 	}
 }
 
+func GetWorkflowExecutionInfo(ctx context.Context, client sdkclient.Client, wfId, runId string) (*workflow.WorkflowExecutionInfo, error) {
+	res, err := client.DescribeWorkflowExecution(ctx, wfId, runId)
+	if err != nil {
+		return nil, err
+	}
+	return res.WorkflowExecutionInfo, nil
+}
+
 func (state *WorkflowExecutionState) GetName() string {
 	return state.Type.Name
 }
@@ -130,14 +150,17 @@ func (state *WorkflowExecutionState) GetDuration() *time.Duration {
 	return getDuration(state.StartTime, state.CloseTime)
 }
 
-// newActivity adds a new ActivityExecutionState to the WorkflowExecutionState's ChildStates.
-func (state *WorkflowExecutionState) newActivity(event *history.HistoryEvent) *ActivityExecutionState {
+// newActivityFromEvent adds a new ActivityExecutionState to the WorkflowExecutionState's ChildStates.
+func (state *WorkflowExecutionState) newActivityFromEvent(event *history.HistoryEvent) *ActivityExecutionState {
 	if state.activityMap == nil {
 		state.activityMap = make(map[int64]*ActivityExecutionState)
+		state.activityMapLock = sync.RWMutex{}
 	}
 	activityState := NewActivityExecutionState()
 	activityState.Update(event)
 
+	state.activityMapLock.Lock()
+	defer state.activityMapLock.Unlock()
 	state.activityMap[event.EventId] = activityState
 	state.ChildStates = append(state.ChildStates, activityState)
 
@@ -146,44 +169,50 @@ func (state *WorkflowExecutionState) newActivity(event *history.HistoryEvent) *A
 
 // updateActivity updates a child ActivityExecutionState with a HistoryEvent by its scheduleId
 func (state *WorkflowExecutionState) updateActivity(scheduledId int64, event *history.HistoryEvent) {
+	state.activityMapLock.RLock()
+	defer state.activityMapLock.RUnlock()
 	if activityState, ok := state.activityMap[scheduledId]; ok {
 		activityState.Update(event)
 	}
 }
 
-// FindChildWorkflow searches for a child workflow that matches the given WorkflowExecution. It's searched within the ChildStates list to avoid concurrent map writes.
-func (state *WorkflowExecutionState) FindChildWorkflow(execution *common.WorkflowExecution) *WorkflowExecutionState {
-	for _, child := range state.ChildStates {
-		if wf, ok := child.(*WorkflowExecutionState); ok && wf.Execution == execution {
-			return wf
-		}
-	}
-	return nil
-}
-
-// newChildWorkflow adds a new WorkflowExecutionState to the WorkflowExecutionState's ChildStates.
-func (state *WorkflowExecutionState) newChildWorkflow(event *history.HistoryEvent) *WorkflowExecutionState {
+// newChildWorkflowFromEvent adds a new WorkflowExecutionState to the WorkflowExecutionState's ChildStates.
+func (state *WorkflowExecutionState) newChildWorkflowFromEvent(event *history.HistoryEvent) *WorkflowExecutionState {
 	if state.childWfMap == nil {
 		state.childWfMap = make(map[int64]*WorkflowExecutionState)
+		state.childWfMapLock = sync.RWMutex{}
 	}
 	attrs := event.GetStartChildWorkflowExecutionInitiatedEventAttributes()
 	childWfState := NewWorkflowExecutionState(attrs.GetWorkflowId(), "")
 	childWfState.Type = attrs.GetWorkflowType()
 
+	state.childWfMapLock.Lock()
+	defer state.childWfMapLock.Unlock()
 	state.childWfMap[event.EventId] = childWfState
 	state.ChildStates = append(state.ChildStates, childWfState)
 
 	return childWfState
 }
 
-// newTimer adds a new TimerExecutionState to the WorkflowExecutionState's ChildStates.
-func (state *WorkflowExecutionState) newTimer(event *history.HistoryEvent) *TimerExecutionState {
+// GetChildWorkflowByEventId returns a child workflow for a given initiated event id
+func (state *WorkflowExecutionState) GetChildWorkflowByEventId(initiatedEventId int64) (*WorkflowExecutionState, bool) {
+	state.childWfMapLock.RLock()
+	defer state.childWfMapLock.RUnlock()
+	childWfState, ok := state.childWfMap[initiatedEventId]
+	return childWfState, ok
+}
+
+// newTimerFromEvent adds a new TimerExecutionState to the WorkflowExecutionState's ChildStates.
+func (state *WorkflowExecutionState) newTimerFromEvent(event *history.HistoryEvent) *TimerExecutionState {
 	if state.timerMap == nil {
 		state.timerMap = make(map[int64]*TimerExecutionState)
+		state.timerMapLock = sync.RWMutex{}
 	}
 	timerState := &TimerExecutionState{}
 	timerState.Update(event)
 
+	state.timerMapLock.Lock()
+	defer state.timerMapLock.Unlock()
 	state.timerMap[event.EventId] = timerState
 	state.ChildStates = append(state.ChildStates, timerState)
 
@@ -192,18 +221,26 @@ func (state *WorkflowExecutionState) newTimer(event *history.HistoryEvent) *Time
 
 // updateTimer updates a child TimerExecutionState with a HistoryEvent by its startedId
 func (state *WorkflowExecutionState) updateTimer(startedId int64, event *history.HistoryEvent) {
+	state.timerMapLock.RLock()
+	defer state.timerMapLock.RUnlock()
 	if timerState, ok := state.timerMap[startedId]; ok {
 		timerState.Update(event)
 	}
 }
 
-// IsCompleted returns true when the Workflow Execution is completed in a non-failed state.
-// This is useful to know if we should fetch child workflows or fold the information.
-// For now this is when the workflow is completed, terminated or canceled.
-func (state *WorkflowExecutionState) IsCompleted() bool {
-	return state.Status == enums.WORKFLOW_EXECUTION_STATUS_COMPLETED ||
-		state.Status == enums.WORKFLOW_EXECUTION_STATUS_CANCELED ||
-		state.Status == enums.WORKFLOW_EXECUTION_STATUS_TERMINATED
+// IsClosed returns true when the Workflow Execution is closed. A Closed status means that the Workflow Execution cannot make further progress.
+func (state *WorkflowExecutionState) IsClosed() bool {
+	switch state.Status {
+	case enums.WORKFLOW_EXECUTION_STATUS_CANCELED,
+		enums.WORKFLOW_EXECUTION_STATUS_COMPLETED,
+		enums.WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW,
+		enums.WORKFLOW_EXECUTION_STATUS_FAILED,
+		enums.WORKFLOW_EXECUTION_STATUS_TERMINATED,
+		enums.WORKFLOW_EXECUTION_STATUS_TIMED_OUT:
+		return true
+	default:
+		return false
+	}
 }
 
 // Update updates the WorkflowExecutionState and its child states with a HistoryEvent.
@@ -275,7 +312,7 @@ func (state *WorkflowExecutionState) Update(event *history.HistoryEvent) {
 	// ACTIVITY EVENTS
 	case enums.EVENT_TYPE_ACTIVITY_TASK_SCHEDULED:
 		// First activity event
-		state.newActivity(event)
+		state.newActivityFromEvent(event)
 	case enums.EVENT_TYPE_ACTIVITY_TASK_STARTED:
 		attrs := event.GetActivityTaskStartedEventAttributes()
 		state.updateActivity(attrs.ScheduledEventId, event)
@@ -298,7 +335,7 @@ func (state *WorkflowExecutionState) Update(event *history.HistoryEvent) {
 	// CHILD WORKFLOW EVENTS
 	case enums.EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED:
 		// First child workflow
-		state.newChildWorkflow(event)
+		state.newChildWorkflowFromEvent(event)
 	case enums.EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_STARTED:
 		attrs := event.GetChildWorkflowExecutionStartedEventAttributes()
 		if child, ok := state.childWfMap[attrs.InitiatedEventId]; ok {
@@ -354,7 +391,7 @@ func (state *WorkflowExecutionState) Update(event *history.HistoryEvent) {
 
 	// TIMER EVENTS
 	case enums.EVENT_TYPE_TIMER_STARTED:
-		state.newTimer(event)
+		state.newTimerFromEvent(event)
 	case enums.EVENT_TYPE_TIMER_FIRED:
 		startedId := event.GetTimerFiredEventAttributes().GetStartedEventId()
 		state.updateTimer(startedId, event)
