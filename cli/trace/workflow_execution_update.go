@@ -1,8 +1,10 @@
 package trace
 
 import (
+	"context"
 	"fmt"
 	"github.com/alitto/pond"
+	sdkclient "go.temporal.io/sdk/client"
 )
 
 type WorkflowExecutionUpdate struct {
@@ -42,7 +44,7 @@ type WorkflowExecutionUpdateIteratorImpl struct {
 //		update = iter.Next()
 //		PrintWorkflowState(update.State)
 //	}
-func GetWorkflowExecutionUpdates(ctx context.Context, client client.Client, wfId, runId string, fetchAll bool, depth int, concurrency int) (WorkflowExecutionUpdateIterator, error) {
+func GetWorkflowExecutionUpdates(ctx context.Context, client sdkclient.Client, wfId, runId string, fetchAll bool, depth int, concurrency int) (WorkflowExecutionUpdateIterator, error) {
 	if concurrency < 1 {
 		return nil, fmt.Errorf("invalid value for concurrency (expected non-zero positive integer, got %d)", concurrency)
 	}

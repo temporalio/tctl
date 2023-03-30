@@ -45,6 +45,7 @@ func NewWorkflowStateJob(ctx context.Context, client sdkclient.Client, state *Wo
 }
 
 // Run starts the WorkflowStateJob, which retrieves the workflow's events and spawns new jobs for the child workflows once it's up-to-date.
+// New jobs are submitted to the pool when the job is up-to-date to reduce the amount of unnecessary history fetches (e.g. when the child workflow is already completed).
 func (job *WorkflowStateJob) Run(group *pond.TaskGroupWithContext) func() error {
 	return func() error {
 		state := job.state
