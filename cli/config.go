@@ -68,7 +68,7 @@ func EnvProperty(c *cli.Context) error {
 
 	env, key := envKey(fullKey)
 
-	val := tctlConfig.EnvProperty(env, key)
+	val, _ := tctlConfig.EnvProperty(env, key)
 	fmt.Println(val)
 
 	return nil
@@ -148,7 +148,7 @@ func populateFlagsFunc(command *cli.Command, globalFlags []cli.Flag) func(ctx *c
 
 			for _, c := range ctx.Lineage() {
 				if !c.IsSet(name) {
-					value := tctlConfig.EnvProperty(tctlConfig.CurrentEnv, name)
+					value, _ := tctlConfig.EnvProperty(tctlConfig.CurrentEnv, name)
 					if value != "" {
 						c.Set(name, value)
 					}

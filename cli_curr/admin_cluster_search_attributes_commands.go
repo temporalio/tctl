@@ -46,6 +46,7 @@ const (
 
 // AdminAddSearchAttributes to add search attributes
 func AdminAddSearchAttributes(c *cli.Context) {
+	namespace := getRequiredGlobalOption(c, FlagNamespace)
 	names := getRequiredStringSliceOption(c, FlagName)
 	typeStrs := getRequiredStringSliceOption(c, FlagType)
 
@@ -54,7 +55,7 @@ func AdminAddSearchAttributes(c *cli.Context) {
 	}
 
 	adminClient := cFactory.AdminClient(c)
-	existingSearchAttributes, err := getSearchAttributes(c, adminClient)
+	existingSearchAttributes, err := getSearchAttributes(c, adminClient, namespace)
 	if err != nil {
 		ErrorAndExit("Unable to get existing search attributes.", err)
 	}
@@ -105,6 +106,7 @@ func AdminAddSearchAttributes(c *cli.Context) {
 		SearchAttributes: searchAttributes,
 		IndexName:        c.String(FlagElasticsearchIndex),
 		SkipSchemaUpdate: c.Bool(FlagSkipSchemaUpdate),
+		Namespace:        namespace,
 	}
 
 	ctx, cancel := newContextWithTimeout(c, addSearchAttributesTimeout)
@@ -114,16 +116,12 @@ func AdminAddSearchAttributes(c *cli.Context) {
 		ErrorAndExit("Unable to add search attributes.", err)
 	}
 
-	resp, err := getSearchAttributes(c, adminClient)
-	if err != nil {
-		ErrorAndExit("Search attributes have been added successfully but there was an error while reading them back.", err)
-	}
-	printSearchAttributesResponse(resp, c.String(FlagElasticsearchIndex))
 	color.HiGreen("Search attributes have been added successfully.")
 }
 
 // AdminRemoveSearchAttributes to add search attributes
 func AdminRemoveSearchAttributes(c *cli.Context) {
+	namespace := getRequiredGlobalOption(c, FlagNamespace)
 	names := getRequiredStringSliceOption(c, FlagName)
 
 	// ask user for confirmation
@@ -139,6 +137,7 @@ func AdminRemoveSearchAttributes(c *cli.Context) {
 	request := &adminservice.RemoveSearchAttributesRequest{
 		SearchAttributes: names,
 		IndexName:        c.String(FlagElasticsearchIndex),
+		Namespace:        namespace,
 	}
 
 	_, err := adminClient.RemoveSearchAttributes(ctx, request)
@@ -146,18 +145,14 @@ func AdminRemoveSearchAttributes(c *cli.Context) {
 		ErrorAndExit("Unable to remove search attributes.", err)
 	}
 
-	resp, err := getSearchAttributes(c, adminClient)
-	if err != nil {
-		ErrorAndExit("Search attributes have been removed successfully but there was an error while reading them back.", err)
-	}
-	printSearchAttributesResponse(resp, c.String(FlagElasticsearchIndex))
 	color.HiGreen("Search attributes have been removed successfully.")
 }
 
 // AdminGetSearchAttributes to print search attributes
 func AdminGetSearchAttributes(c *cli.Context) {
+	namespace := getRequiredGlobalOption(c, FlagNamespace)
 	adminClient := cFactory.AdminClient(c)
-	resp, err := getSearchAttributes(c, adminClient)
+	resp, err := getSearchAttributes(c, adminClient, namespace)
 	if err != nil {
 		ErrorAndExit("Unable to get search attributes.", err)
 	}
@@ -168,11 +163,16 @@ func AdminGetSearchAttributes(c *cli.Context) {
 	printSearchAttributesResponse(resp, c.String(FlagElasticsearchIndex))
 }
 
-func getSearchAttributes(c *cli.Context, adminClient adminservice.AdminServiceClient) (*adminservice.GetSearchAttributesResponse, error) {
+func getSearchAttributes(
+	c *cli.Context,
+	adminClient adminservice.AdminServiceClient,
+	namespace string,
+) (*adminservice.GetSearchAttributesResponse, error) {
 	ctx, cancel := newContext(c)
 	defer cancel()
 	request := &adminservice.GetSearchAttributesRequest{
 		IndexName: c.String(FlagElasticsearchIndex),
+		Namespace: namespace,
 	}
 	return adminClient.GetSearchAttributes(ctx, request)
 }

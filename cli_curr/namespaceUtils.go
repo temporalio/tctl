@@ -25,7 +25,6 @@
 package cli_curr
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/golang/mock/gomock"
@@ -34,7 +33,6 @@ import (
 	"go.temporal.io/api/workflowservice/v1"
 	"go.temporal.io/server/common/archiver"
 	"go.temporal.io/server/common/archiver/provider"
-	"go.temporal.io/server/common/clock"
 	"go.temporal.io/server/common/cluster"
 	"go.temporal.io/server/common/config"
 	"go.temporal.io/server/common/dynamicconfig"
@@ -195,44 +193,6 @@ func initializeFrontendClient(
 	return cFactory.FrontendClient(context)
 }
 
-func initializeAdminNamespaceHandler(
-	context *cli.Context,
-) (namespace.Handler, error) {
-
-	configuration := loadConfig(context)
-	logger := log.NewZapLogger(log.BuildZapLogger(configuration.Log))
-	metricsClient := initializeMetricsHandler(logger)
-
-	factory := initializePersistenceFactory(
-		&configuration.Persistence,
-		func() int {
-			return dependencyMaxQPS
-		},
-		"",
-		metricsClient,
-		logger,
-	)
-
-	metadataMgr, err := factory.NewMetadataManager()
-	if err != nil {
-		return nil, fmt.Errorf("unable to initialize metadata manager: %v", err)
-	}
-
-	clusterMetadata := initializeClusterMetadata(configuration)
-
-	dynamicConfig := initializeDynamicConfig(configuration, logger)
-
-	return initializeNamespaceHandler(
-		logger,
-		metadataMgr,
-		clusterMetadata,
-		initializeArchivalMetadata(configuration, dynamicConfig),
-		initializeArchivalProvider(configuration, clusterMetadata, metricsClient, logger),
-		nil,
-		nil,
-	), nil
-}
-
 func loadConfig(
 	context *cli.Context,
 ) *config.Config {
@@ -247,33 +207,11 @@ func loadConfig(
 	return &cfg
 }
 
-func initializeNamespaceHandler(
-	logger log.Logger,
-	metadataMgr persistence.MetadataManager,
-	clusterMetadata cluster.Metadata,
-	archivalMetadata archiver.ArchivalMetadata,
-	archiverProvider provider.ArchiverProvider,
-	enableSchedules dynamicconfig.BoolPropertyFnWithNamespaceFilter,
-	timeSource clock.TimeSource,
-) namespace.Handler {
-	return namespace.NewHandler(
-		dynamicconfig.GetIntPropertyFilteredByNamespace(namespace.MaxBadBinaries),
-		logger,
-		metadataMgr,
-		clusterMetadata,
-		initializeNamespaceReplicator(logger),
-		archivalMetadata,
-		archiverProvider,
-		enableSchedules,
-		timeSource,
-	)
-}
-
 func initializePersistenceFactory(
 	pConfig *config.Persistence,
 	maxQps client.PersistenceMaxQps,
 	clusterName string,
-	metricsHandler metrics.MetricsHandler,
+	metricsHandler metrics.Handler,
 	logger log.Logger,
 ) client.Factory {
 
@@ -330,7 +268,7 @@ func initializeArchivalMetadata(
 func initializeArchivalProvider(
 	serviceConfig *config.Config,
 	clusterMetadata cluster.Metadata,
-	metricsHandler metrics.MetricsHandler,
+	metricsHandler metrics.Handler,
 	logger log.Logger,
 ) provider.ArchiverProvider {
 
@@ -352,7 +290,7 @@ func initializeArchivalProvider(
 	}
 
 	err := archiverProvider.RegisterBootstrapContainer(
-		primitives.FrontendService,
+		string(primitives.FrontendService),
 		historyArchiverBootstrapContainer,
 		visibilityArchiverBootstrapContainer,
 	)
@@ -391,7 +329,7 @@ func initializeDynamicConfig(
 	return dynamicconfig.NewCollection(dynamicConfigClient, logger)
 }
 
-func initializeMetricsHandler(logger log.Logger) metrics.MetricsHandler {
+func initializeMetricsHandler(logger log.Logger) metrics.Handler {
 	return metrics.MetricsHandlerFromConfig(logger, &metrics.Config{})
 }
 
