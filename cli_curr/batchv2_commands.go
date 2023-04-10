@@ -75,12 +75,12 @@ func ListBatchJobsV2(c *cli.Context) {
 			Namespace: namespace,
 		})
 
-		for _, e := range resp.OperationInfo {
-			items = append(items, e)
-		}
-
 		if err != nil {
 			return nil, nil, err
+		}
+
+		for _, e := range resp.OperationInfo {
+			items = append(items, e)
 		}
 
 		return items, npt, nil
