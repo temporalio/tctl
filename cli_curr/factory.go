@@ -184,6 +184,7 @@ func (b *clientFactory) createTLSConfig(c *cli.Context) (*tls.Config, error) {
 	caPath := c.GlobalString(FlagTLSCaPath)
 	disableHostNameVerification := c.GlobalBool(FlagTLSDisableHostVerification)
 	serverName := c.GlobalString(FlagTLSServerName)
+	enableTLS := c.GlobalBool(FlagEnableTLS)
 
 	var host string
 	var cert *tls.Certificate
@@ -230,6 +231,17 @@ func (b *clientFactory) createTLSConfig(c *cli.Context) (*tls.Config, error) {
 	// If we are given a server name, set the TLS server name for DNS resolution
 	if serverName != "" {
 		host = serverName
+		tlsConfig := auth.NewTLSConfigForServer(host, !disableHostNameVerification)
+		return tlsConfig, nil
+	}
+	// If we are given a TLS flag, set the TLS server name from the address
+	if enableTLS {
+		hostPort := c.GlobalString(FlagAddress)
+		if hostPort == "" {
+			hostPort = localHostPort
+		}
+		// Ignoring error as we'll fail to dial anyway, and that will produce a meaningful error
+		host, _, _ = net.SplitHostPort(hostPort)
 		tlsConfig := auth.NewTLSConfigForServer(host, !disableHostNameVerification)
 		return tlsConfig, nil
 	}
