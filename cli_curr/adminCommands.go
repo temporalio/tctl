@@ -682,7 +682,7 @@ func AdminDescribeHistoryHost(c *cli.Context) {
 func AdminRefreshWorkflowTasks(c *cli.Context) {
 	adminClient := cFactory.AdminClient(c)
 
-	namespace := getRequiredGlobalOption(c, FlagNamespaceID)
+	namespaceId := getRequiredOption(c, FlagNamespaceID)
 	wid := getRequiredOption(c, FlagWorkflowID)
 	rid := c.String(FlagRunID)
 
@@ -690,7 +690,7 @@ func AdminRefreshWorkflowTasks(c *cli.Context) {
 	defer cancel()
 
 	_, err := adminClient.RefreshWorkflowTasks(ctx, &adminservice.RefreshWorkflowTasksRequest{
-		NamespaceId: namespace,
+		NamespaceId: namespaceId,
 		Execution: &commonpb.WorkflowExecution{
 			WorkflowId: wid,
 			RunId:      rid,
