@@ -51,6 +51,7 @@ import (
 	"go.temporal.io/sdk/converter"
 	"go.temporal.io/server/common/codec"
 	"go.temporal.io/server/common/payloads"
+	"google.golang.org/grpc/metadata"
 )
 
 // HistoryEventToString convert HistoryEvent to string
@@ -549,7 +550,11 @@ func NewContextWithCLIHeaders() (context.Context, context.CancelFunc) {
 
 // NewContextWithTimeoutAndCLIHeaders creates context with timeout and version headers for CLI.
 func NewContextWithTimeoutAndCLIHeaders(timeout time.Duration) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(headers.SetCLIVersions(context.Background()), timeout)
+	ctx, cancel := context.WithTimeout(headers.SetCLIVersions(context.Background()), timeout)
+	ctx = metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{
+		"xdc-redirection": "false",
+	}))
+	return ctx, cancel
 }
 
 func unmarshalInputsFromCLI(c *cli.Context) ([]interface{}, error) {

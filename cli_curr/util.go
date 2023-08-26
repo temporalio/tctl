@@ -44,8 +44,10 @@ import (
 	commonpb "go.temporal.io/api/common/v1"
 	enumspb "go.temporal.io/api/enums/v1"
 	historypb "go.temporal.io/api/history/v1"
+	"go.temporal.io/api/workflowservice/v1"
 	sdkclient "go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/temporalio/tctl/cli/headers"
 	"github.com/temporalio/tctl/cli_curr/dataconverter"
@@ -410,6 +412,11 @@ func getSDKClient(c *cli.Context) sdkclient.Client {
 	return cFactory.SDKClient(c, namespace)
 }
 
+func getFrontendClient(c *cli.Context) (workflowservice.WorkflowServiceClient, string) {
+	namespace := getRequiredGlobalOption(c, FlagNamespace)
+	return cFactory.FrontendClient(c), namespace
+}
+
 func getRequiredOption(c *cli.Context, optionName string) string {
 	value := c.String(optionName)
 	if len(value) == 0 {
@@ -619,7 +626,11 @@ func NewContextWithCLIHeaders() (context.Context, context.CancelFunc) {
 
 // NewContextWithTimeoutAndCLIHeaders creates context with timeout and version headers for CLI.
 func NewContextWithTimeoutAndCLIHeaders(timeout time.Duration) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(headers.SetCLIVersions(context.Background()), timeout)
+	ctx, cancel := context.WithTimeout(headers.SetCLIVersions(context.Background()), timeout)
+	ctx = metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{
+		"xdc-redirection": "false",
+	}))
+	return ctx, cancel
 }
 
 // process and validate input provided through cmd or file

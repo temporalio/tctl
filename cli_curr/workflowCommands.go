@@ -1051,7 +1051,7 @@ func createTableForListWorkflow(c *cli.Context, listAll bool, queryOpen bool) *t
 }
 
 func listWorkflow(c *cli.Context, table *tablewriter.Table, queryOpen bool) func([]byte) ([]byte, int) {
-	sdkClient := getSDKClient(c)
+	frontendClient, namespace := getFrontendClient(c)
 
 	earliestTime := parseTime(c.String(FlagEarliestTime), time.Time{}, time.Now().UTC())
 	latestTime := parseTime(c.String(FlagLatestTime), time.Now().UTC(), time.Now().UTC())
@@ -1085,11 +1085,11 @@ func listWorkflow(c *cli.Context, table *tablewriter.Table, queryOpen bool) func
 		var nextPageToken []byte
 		if c.IsSet(FlagListQuery) {
 			listQuery := c.String(FlagListQuery)
-			result, nextPageToken = listWorkflowExecutions(sdkClient, pageSize, next, listQuery, c)
+			result, nextPageToken = listWorkflowExecutions(frontendClient, namespace, pageSize, next, listQuery, c)
 		} else if queryOpen {
-			result, nextPageToken = listOpenWorkflow(sdkClient, pageSize, earliestTime, latestTime, workflowID, workflowType, next, c)
+			result, nextPageToken = listOpenWorkflow(frontendClient, namespace, pageSize, earliestTime, latestTime, workflowID, workflowType, next, c)
 		} else {
-			result, nextPageToken = listClosedWorkflow(sdkClient, pageSize, earliestTime, latestTime, workflowID, workflowType, workflowStatus, next, c)
+			result, nextPageToken = listClosedWorkflow(frontendClient, namespace, pageSize, earliestTime, latestTime, workflowID, workflowType, workflowStatus, next, c)
 		}
 
 		appendWorkflowExecutionsToTable(
@@ -1175,10 +1175,11 @@ func trimWorkflowType(str string) string {
 	return res
 }
 
-func listWorkflowExecutions(sdkClient sdkclient.Client, pageSize int, nextPageToken []byte, query string, c *cli.Context) (
+func listWorkflowExecutions(sdkClient workflowservice.WorkflowServiceClient, namespace string, pageSize int, nextPageToken []byte, query string, c *cli.Context) (
 	[]*workflowpb.WorkflowExecutionInfo, []byte) {
 
 	request := &workflowservice.ListWorkflowExecutionsRequest{
+		Namespace:     namespace,
 		PageSize:      int32(pageSize),
 		NextPageToken: nextPageToken,
 		Query:         query,
@@ -1187,7 +1188,7 @@ func listWorkflowExecutions(sdkClient sdkclient.Client, pageSize int, nextPageTo
 	op := func() error {
 		ctx, cancel := newContext(c)
 		defer cancel()
-		response, err := sdkClient.ListWorkflow(ctx, request)
+		response, err := sdkClient.ListWorkflowExecutions(ctx, request)
 		if err != nil {
 			return err
 		}
@@ -1201,10 +1202,11 @@ func listWorkflowExecutions(sdkClient sdkclient.Client, pageSize int, nextPageTo
 	return workflows.Executions, workflows.NextPageToken
 }
 
-func listOpenWorkflow(sdkClient sdkclient.Client, pageSize int, earliestTime, latestTime time.Time, workflowID, workflowType string,
+func listOpenWorkflow(sdkClient workflowservice.WorkflowServiceClient, namespace string, pageSize int, earliestTime, latestTime time.Time, workflowID, workflowType string,
 	nextPageToken []byte, c *cli.Context) ([]*workflowpb.WorkflowExecutionInfo, []byte) {
 
 	request := &workflowservice.ListOpenWorkflowExecutionsRequest{
+		Namespace:       namespace,
 		MaximumPageSize: int32(pageSize),
 		NextPageToken:   nextPageToken,
 		StartTimeFilter: &filterpb.StartTimeFilter{
@@ -1223,7 +1225,7 @@ func listOpenWorkflow(sdkClient sdkclient.Client, pageSize int, earliestTime, la
 	op := func() error {
 		ctx, cancel := newContext(c)
 		defer cancel()
-		response, err := sdkClient.ListOpenWorkflow(ctx, request)
+		response, err := sdkClient.ListOpenWorkflowExecutions(ctx, request)
 		if err != nil {
 			return err
 		}
@@ -1237,10 +1239,11 @@ func listOpenWorkflow(sdkClient sdkclient.Client, pageSize int, earliestTime, la
 	return workflows.Executions, workflows.NextPageToken
 }
 
-func listClosedWorkflow(sdkClient sdkclient.Client, pageSize int, earliestTime, latestTime time.Time, workflowID, workflowType string,
+func listClosedWorkflow(sdkClient workflowservice.WorkflowServiceClient, namespace string, pageSize int, earliestTime, latestTime time.Time, workflowID, workflowType string,
 	workflowStatus enumspb.WorkflowExecutionStatus, nextPageToken []byte, c *cli.Context) ([]*workflowpb.WorkflowExecutionInfo, []byte) {
 
 	request := &workflowservice.ListClosedWorkflowExecutionsRequest{
+		Namespace:       namespace,
 		MaximumPageSize: int32(pageSize),
 		NextPageToken:   nextPageToken,
 		StartTimeFilter: &filterpb.StartTimeFilter{
@@ -1262,7 +1265,7 @@ func listClosedWorkflow(sdkClient sdkclient.Client, pageSize int, earliestTime, 
 	op := func() error {
 		ctx, cancel := newContext(c)
 		defer cancel()
-		response, err := sdkClient.ListClosedWorkflow(ctx, request)
+		response, err := sdkClient.ListClosedWorkflowExecutions(ctx, request)
 		if err != nil {
 			return err
 		}
@@ -1277,7 +1280,7 @@ func listClosedWorkflow(sdkClient sdkclient.Client, pageSize int, earliestTime, 
 }
 
 func getListResultInRaw(c *cli.Context, queryOpen bool, nextPageToken []byte) ([]*workflowpb.WorkflowExecutionInfo, []byte) {
-	sdkClient := getSDKClient(c)
+	frontendClient, namespace := getFrontendClient(c)
 	earliestTime := parseTime(c.String(FlagEarliestTime), time.Time{}, time.Now().UTC())
 	latestTime := parseTime(c.String(FlagLatestTime), time.Now().UTC(), time.Now().UTC())
 	workflowID := c.String(FlagWorkflowID)
@@ -1304,11 +1307,11 @@ func getListResultInRaw(c *cli.Context, queryOpen bool, nextPageToken []byte) ([
 	var result []*workflowpb.WorkflowExecutionInfo
 	if c.IsSet(FlagListQuery) {
 		listQuery := c.String(FlagListQuery)
-		result, nextPageToken = listWorkflowExecutions(sdkClient, pageSize, nextPageToken, listQuery, c)
+		result, nextPageToken = listWorkflowExecutions(frontendClient, namespace, pageSize, nextPageToken, listQuery, c)
 	} else if queryOpen {
-		result, nextPageToken = listOpenWorkflow(sdkClient, pageSize, earliestTime, latestTime, workflowID, workflowType, nextPageToken, c)
+		result, nextPageToken = listOpenWorkflow(frontendClient, namespace, pageSize, earliestTime, latestTime, workflowID, workflowType, nextPageToken, c)
 	} else {
-		result, nextPageToken = listClosedWorkflow(sdkClient, pageSize, earliestTime, latestTime, workflowID, workflowType, workflowStatus, nextPageToken, c)
+		result, nextPageToken = listClosedWorkflow(frontendClient, namespace, pageSize, earliestTime, latestTime, workflowID, workflowType, workflowStatus, nextPageToken, c)
 	}
 
 	return result, nextPageToken
