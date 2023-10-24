@@ -97,6 +97,7 @@ var (
 	FlagJobID                      = "job-id"
 	FlagYes                        = "yes"
 	FlagYesAlias                   = []string{"y"}
+	FlagEnableTLS                  = "tls"
 	FlagTLSCertPath                = "tls-cert-path"
 	FlagTLSKeyPath                 = "tls-key-path"
 	FlagTLSCaPath                  = "tls-ca-path"
