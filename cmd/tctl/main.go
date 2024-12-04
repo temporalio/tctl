@@ -35,10 +35,12 @@ import (
 
 // See https://docs.temporal.io/tctl/ for usage
 func main() {
-	tctlConfig, _ := config.NewTctlConfig()
+	tctlConfig, err := config.NewTctlConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
 	version := tctlConfig.Version
 
-	var err error
 	if version == "next" || version == "2" {
 		appNext := cli.NewCliApp()
 		err = appNext.Run(os.Args)
