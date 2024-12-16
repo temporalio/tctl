@@ -6,7 +6,7 @@ The `tctl` CLI is now deprecated in favor of Temporal CLI. <br />
 This repository is no longer maintained. <br />
 Please use the new utility for all future development. <br />
 
-* New [`Temporal CLI` repository](https://github.com/temporalio/cli).
+* New [Temporal CLI repository](https://github.com/temporalio/cli).
 * [Temporal CLI Documentation site](https://docs.temporal.io/cli).
 
 # tctl
