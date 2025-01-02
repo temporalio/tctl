@@ -36,10 +36,12 @@ const (
 	SupportedServerVersionsHeaderName = "supported-server-versions"
 	SupportedFeaturesHeaderName       = "supported-features"
 	SupportedFeaturesHeaderDelim      = ","
+	CallerTypeHeaderName              = "caller-type"
 )
 
 const (
 	ClientNameCLI = "temporal-cli"
+	CallerTypeCLI = "operator"
 
 	CLIVersion = "1.18.0"
 
@@ -54,6 +56,7 @@ var (
 		ClientVersionHeaderName,
 		SupportedServerVersionsHeaderName,
 		SupportedFeaturesHeaderName,
+		CallerTypeHeaderName,
 	}
 
 	internalVersionHeaders = metadata.New(map[string]string{
@@ -62,6 +65,7 @@ var (
 
 	cliVersionHeaders = metadata.New(map[string]string{
 		ClientNameHeaderName:              ClientNameCLI,
+		CallerTypeHeaderName:              CallerTypeCLI,
 		ClientVersionHeaderName:           CLIVersion,
 		SupportedServerVersionsHeaderName: SupportedServerVersions,
 		// TODO: This should include SupportedFeaturesHeaderName with a value that's taken
