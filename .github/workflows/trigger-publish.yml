@@ -16,6 +16,14 @@ jobs:
         shell: bash
 
     steps:
+      - name: Generate token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.TEMPORAL_CICD_APP_ID }}
+          private-key: ${{ secrets.TEMPORAL_CICD_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
       - name: Get git branch name
         id: get_branch
         run: |
@@ -23,7 +31,7 @@ jobs:
 
       - name: Dispatch docker builds Github Action
         env:
-          PAT: ${{ secrets.COMMANDER_DATA_TOKEN }}
+          PAT: ${{ steps.generate_token.outputs.token }}
           PARENT_REPO: temporalio/docker-builds
           PARENT_BRANCH: ${{ toJSON('main') }}
           WORKFLOW_ID: update-submodules.yml
