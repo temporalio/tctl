@@ -28,15 +28,21 @@ import (
 	"log"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/temporalio/tctl/cli"
 	"github.com/temporalio/tctl/cli_curr"
 	"github.com/temporalio/tctl/config"
 )
 
+const deprecationNotice = ("DEPRECATION NOTICE: tctl will enter End of Support September 30, 2025. " +
+	"Please transition to Temporal CLI (https://docs.temporal.io/cli).")
+
 // See https://docs.temporal.io/tctl/ for usage
 func main() {
 	tctlConfig, _ := config.NewTctlConfig()
 	version := tctlConfig.Version
+
+	os.Stderr.WriteString(color.RedString(deprecationNotice) + "\n\n")
 
 	var err error
 	if version == "next" || version == "2" {
