@@ -25,29 +25,27 @@ package headersprovider
 import (
 	"context"
 
+	"github.com/temporalio/tctl/cli/headers"
 	"github.com/temporalio/tctl/cli/plugin"
 )
-
-type HeadersProvider interface {
-	GetHeaders(context.Context) (map[string]string, error)
-}
 
 var (
 	headersProvider plugin.HeadersProvider = nil
 )
 
-type authHeaderProvider struct {
-	value string
+type headerProvider struct {
+	authHeaderValue string
 }
 
-func (a authHeaderProvider) GetHeaders(ctx context.Context) (map[string]string, error) {
+func (a headerProvider) GetHeaders(ctx context.Context) (map[string]string, error) {
 	return map[string]string{
-		"Authorization": a.value,
+		headers.CallerTypeHeaderName: headers.CallerTypeCLI,
+		"Authorization":              a.authHeaderValue,
 	}, nil
 }
 
 func SetAuthorizationHeader(value string) {
-	headersProvider = &authHeaderProvider{value: value}
+	headersProvider = &headerProvider{authHeaderValue: value}
 }
 
 func SetCurrent(hp plugin.HeadersProvider) {
