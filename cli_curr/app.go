@@ -77,6 +77,11 @@ func NewCliApp() *cli.App {
 			Name:  FlagAutoConfirm,
 			Usage: "Automatically confirm all prompts",
 		},
+		cli.BoolFlag{
+			Name:   FlagEnableTLS,
+			Usage:  "Enable TLS",
+			EnvVar: "TEMPORAL_CLI_TLS",
+		},
 		cli.StringFlag{
 			Name:   FlagTLSCertPath,
 			Value:  "",
