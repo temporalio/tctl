@@ -53,9 +53,7 @@ func DescribeTaskQueue(c *cli.Context) error {
 	}
 
 	opts := &output.PrintOptions{
-		// TODO enable when versioning feature is out
-		// Fields: []string{"Identity", "LastAccessTime", "RatePerSecond", "WorkerVersioningId"},
-		Fields: []string{"Identity", "LastAccessTime", "RatePerSecond"},
+		Fields: []string{"Identity", "LastAccessTime", "RatePerSecond", "WorkerVersioningId"},
 	}
 	var items []interface{}
 	for _, e := range resp.Pollers {
