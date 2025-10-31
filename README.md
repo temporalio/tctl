@@ -2,7 +2,7 @@
 
 **:warning: End of Support Notice :warning:**
 
-tctl is no longer supported. <br />
+tctl is no longer supported as of September 30, 2025.. <br />
 Please migrate to the Temporal CLI. <br />
 
 * [Temporal CLI repository](https://github.com/temporalio/cli)
