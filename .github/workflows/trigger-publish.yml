@@ -1,5 +1,6 @@
 name: 'Trigger Docker image build'
-
+permissions:
+  contents: read
 on:
   push:
     branches:
