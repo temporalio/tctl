@@ -70,6 +70,11 @@ func NewCliApp() *cli.App {
 			Usage:   "Authorization header to set for gRPC requests",
 			EnvVars: []string{"TEMPORAL_CLI_AUTH"},
 		},
+		&cli.BoolFlag{
+			Name:    FlagEnableTLS,
+			Usage:   "Enable TLS",
+			EnvVars: []string{"TEMPORAL_CLI_TLS"},
+		},
 		&cli.StringFlag{
 			Name:    FlagTLSCertPath,
 			Value:   "",
