@@ -1,9 +1,8 @@
 [![build](https://github.com/temporalio/tctl/actions/workflows/test.yml/badge.svg)](https://github.com/temporalio/tctl/actions/workflows/test.yml)
 
-**:warning: Deprecation Notice :warning:**
+**:warning: End of Support Notice :warning:**
 
-tctl will enter End of Support on September 30, 2025. <br />
-This repository and issues will be archived at that time. <br />
+tctl is no longer supported as of September 30, 2025.. <br />
 Please migrate to the Temporal CLI. <br />
 
 * [Temporal CLI repository](https://github.com/temporalio/cli)
